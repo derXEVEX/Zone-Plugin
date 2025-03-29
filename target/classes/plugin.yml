@@ -1,0 +1,13 @@
+name: ZonePlugin
+version: 1.0
+main: ZoneSystem.ZonePlugin
+api-version:
+commands:
+  zone:
+    description: Erstellt und verwaltet Zonen.
+    usage: /zone <create|confirm>
+    permission: zone.use
+permissions:
+  zone.use:
+    description: Erlaubt die Nutzung des Zone-Plugins.
+    default: true
