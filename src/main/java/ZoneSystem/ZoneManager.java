@@ -3,6 +3,7 @@ package ZoneSystem;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -10,7 +11,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 
 public class ZoneManager {
@@ -39,7 +43,8 @@ public class ZoneManager {
 
     public void loadZones() {
         try (FileReader reader = new FileReader(zoneFile)) {
-            Type zoneListType = new TypeToken<List<Zone>>() {}.getType();
+            Type zoneListType = new TypeToken<List<Zone>>() {
+            }.getType();
             List<Zone> loadedZones = gson.fromJson(reader, zoneListType);
             if (loadedZones != null) {
                 zones.addAll(loadedZones);
@@ -74,17 +79,16 @@ public class ZoneManager {
         return zones.stream().anyMatch(zone -> zone.isOwner(player.getUniqueId()) && zone.isInside(x, z));
     }
 
-
     public Zone getPlayerZone(UUID playerId) {
         return zones.stream()
-                .filter(zone -> zone.getOwner().equals(playerId))
+                .filter(zone -> zone.getOwnerUUID().equals(playerId))
                 .findFirst()
                 .orElse(null);
     }
 
 
     public int getZoneCountForPlayer(UUID playerId) {
-        return (int) zones.stream().filter(zone -> zone.getOwner().equals(playerId)).count();
+        return (int) zones.stream().filter(zone -> zone.getOwnerUUID().equals(playerId)).count();
     }
 
     public void resetZones() {
@@ -97,9 +101,19 @@ public class ZoneManager {
         saveZones();
     }
 
+    public Zone getZoneAt(Location loc) {
+        int x = loc.getBlockX();
+        int z = loc.getBlockZ();
+
+        return zones.stream()
+                .filter(zone -> zone.isInside(x, z))
+                .findFirst()
+                .orElse(null);
+    }
+
     public Optional<Zone> getPlayerZoneOptional(UUID playerId) {
         return zones.stream()
-                .filter(zone -> zone.getOwner().equals(playerId))
+                .filter(zone -> zone.getOwnerUUID().equals(playerId))
                 .findFirst();
     }
 

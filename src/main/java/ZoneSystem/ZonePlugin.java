@@ -22,8 +22,6 @@ public class ZonePlugin extends JavaPlugin {
     }
 
 
-
-
     @Override
     public void onDisable() {
         zoneManager.saveZones();

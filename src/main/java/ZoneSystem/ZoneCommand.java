@@ -12,12 +12,11 @@ public class ZoneCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage("§cDieser Befehl kann nur von einem Spieler ausgeführt werden.");
             return true;
         }
 
-        Player player = (Player) sender;
         UUID playerId = player.getUniqueId();
         ZonePlugin plugin = ZonePlugin.getInstance();
         ZoneManager zoneManager = plugin.getZoneManager();
@@ -42,7 +41,7 @@ public class ZoneCommand implements CommandExecutor {
                 return true;
             }
 
-            Zone zone = selection.toZone(playerId);
+            Zone zone = selection.toZone(playerId, player.getName());
 
             if (!zoneManager.canCreateZone(zone)) {
                 player.sendMessage("§cDiese Zone überschneidet sich mit einer anderen!");

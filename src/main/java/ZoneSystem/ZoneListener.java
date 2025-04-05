@@ -18,9 +18,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.HashMap;
 import java.util.UUID;
 
+
 public class ZoneListener implements Listener {
+
     private final HashMap<UUID, ZoneSelection> selections = new HashMap<>();
     private final HashMap<UUID, BossBar> activeBossBars = new HashMap<>();
+    private final HashMap<UUID, Zone> currentPlayerZones = new HashMap<>();
+
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
@@ -35,9 +39,7 @@ public class ZoneListener implements Listener {
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             selection.setPosition1(event.getClickedBlock().getX(), event.getClickedBlock().getZ());
             player.sendMessage("§aErste Position gesetzt!");
-        }
-
-        else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             selection.setPosition2(event.getClickedBlock().getX(), event.getClickedBlock().getZ());
             player.sendMessage("§aZweite Position gesetzt!");
         }
@@ -63,20 +65,32 @@ public class ZoneListener implements Listener {
         UUID playerId = player.getUniqueId();
         ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
 
-        Zone playerZone = zoneManager.getPlayerZone(playerId);
-        boolean isInZone = playerZone != null;
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX()
+                && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
+            return;
+        }
 
-        if (isInZone) {
-            if (!activeBossBars.containsKey(playerId)) {
-                String zoneName = "Zone: " + playerZone.getOwner() + " #" + zoneManager.getZoneCountForPlayer(playerId);
+        Zone newZone = zoneManager.getZoneAt(player.getLocation());
+        Zone oldZone = currentPlayerZones.get(playerId);
 
-                BossBar bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
-                bossBar.addPlayer(player);
+        if (newZone != null && !newZone.equals(oldZone)) {
+            currentPlayerZones.put(playerId, newZone);
+
+            BossBar bossBar = activeBossBars.get(playerId);
+            String zoneName = "Zone von " + newZone.getOwnerName();
+            if (bossBar == null) {
+                bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
                 activeBossBars.put(playerId, bossBar);
+            } else {
+                bossBar.setTitle(zoneName);
             }
-        } else {
-            if (activeBossBars.containsKey(playerId)) {
-                BossBar bossBar = activeBossBars.remove(playerId);
+            bossBar.addPlayer(player);
+
+        } else if (newZone == null && oldZone != null) {
+            currentPlayerZones.remove(playerId);
+
+            BossBar bossBar = activeBossBars.remove(playerId);
+            if (bossBar != null) {
                 bossBar.removePlayer(player);
             }
         }
@@ -88,17 +102,16 @@ public class ZoneListener implements Listener {
         UUID playerId = player.getUniqueId();
         ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
 
-        Zone playerZone = zoneManager.getPlayerZone(playerId);
+        Zone playerZone = zoneManager.getZoneAt(player.getLocation());
 
-        if (playerZone != null && !activeBossBars.containsKey(playerId)) {
-            String zoneName = "Zone: " + playerZone.getOwner() + " #" + zoneManager.getZoneCountForPlayer(playerId);
+        if (playerZone != null) {
+            currentPlayerZones.put(playerId, playerZone);
+            String zoneName = "Zone von " + playerZone.getOwnerName();
 
             BossBar bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
             bossBar.addPlayer(player);
             activeBossBars.put(playerId, bossBar);
         }
     }
-
-
 }
 
