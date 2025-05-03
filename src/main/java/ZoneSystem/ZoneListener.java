@@ -113,5 +113,18 @@ public class ZoneListener implements Listener {
             activeBossBars.put(playerId, bossBar);
         }
     }
+
+    @EventHandler
+    public void onZoneCreate(ZoneCreateEvent event) {
+        Zone newZone = event.getZone();
+        if (newZone != null) {
+            ZonePlugin plugin = ZonePlugin.getInstance();
+            if (plugin != null && plugin.getZoneManager() != null) {
+                plugin.getZoneManager().saveZoneBackup(newZone);
+            }
+        }
+    }
+
+
 }
 

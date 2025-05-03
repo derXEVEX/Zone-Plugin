@@ -1,11 +1,10 @@
 package ZoneSystem;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.UUID;
 
 public class ZoneCommand implements CommandExecutor {
@@ -22,41 +21,82 @@ public class ZoneCommand implements CommandExecutor {
         ZoneManager zoneManager = plugin.getZoneManager();
         ZoneListener listener = plugin.getZoneListener();
 
-        ZoneSelection selection = listener.getSelection(playerId);
-
         if (args.length == 0) {
-            player.sendMessage("§cVerwendung: /zone create | /zone confirm");
+            player.sendMessage("§cVerwendung: /zone create | confirm | reset <Spielername>#<Nummer> | delete <Spielername>#<Nummer>");
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("create")) {
-            player.getInventory().addItem(plugin.getZoneTool());
-            player.sendMessage("§aDamit kannst du die Zone erstellen. Links-Klick setzt Position 1 | Rechts-Klick setzt Position 2");
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("confirm")) {
-            if (selection == null || !selection.isComplete()) {
-                player.sendMessage("§cDu musst erst zwei Punkte setzen!");
+        switch (args[0].toLowerCase()) {
+            case "create":
+                player.getInventory().addItem(plugin.getZoneTool());
+                player.sendMessage("§aDamit kannst du die Zone erstellen. Links-Klick setzt Position 1 | Rechts-Klick setzt Position 2");
                 return true;
-            }
 
-            Zone zone = selection.toZone(playerId, player.getName());
+            case "confirm":
+                ZoneSelection selection = listener.getSelection(playerId);
+                if (selection == null || !selection.isComplete()) {
+                    player.sendMessage("§cDu musst erst zwei Punkte setzen!");
+                    return true;
+                }
 
-            if (!zoneManager.canCreateZone(zone)) {
-                player.sendMessage("§cDiese Zone überschneidet sich mit einer anderen!");
+                Zone zone = selection.toZone(playerId, player.getName());
+                if (!zoneManager.canCreateZone(zone)) {
+                    player.sendMessage("§cDiese Zone überschneidet sich mit einer anderen!");
+                    return true;
+                }
+
+                zoneManager.addZone(zone);
+                // Event auslösen
+                Bukkit.getPluginManager().callEvent(new ZoneCreateEvent(zone));
+                player.getInventory().removeItem(plugin.getZoneTool());
+                player.sendMessage("§aZone erfolgreich erstellt!");
                 return true;
-            }
 
-            zoneManager.addZone(zone);
+            case "reset":
+            case "delete":
+                if (args.length != 2) {
+                    player.sendMessage("§cVerwendung: /zone " + args[0] + " <Spielername>#<Nummer>");
+                    return true;
+                }
 
-            ItemStack zoneTool = plugin.getZoneTool();
-            player.getInventory().removeItem(zoneTool);
+                String[] zoneParts = args[1].split("#");
+                if (zoneParts.length != 2) {
+                    player.sendMessage("§cUngültiges Format. Beispiel: Spielername#1");
+                    return true;
+                }
 
-            player.sendMessage("§aZone erfolgreich erstellt!");
-            return true;
+                String targetPlayer = zoneParts[0];
+                int zoneNumber;
+                try {
+                    zoneNumber = Integer.parseInt(zoneParts[1]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage("§cUngültige Zonennummer!");
+                    return true;
+                }
+
+                Zone targetZone = zoneManager.getZoneByPlayerAndNumber(targetPlayer, zoneNumber);
+                if (targetZone == null) {
+                    player.sendMessage("§cZone nicht gefunden!");
+                    return true;
+                }
+
+                if (!targetZone.isOwner(playerId) && !player.hasPermission("zone.reset.others")) {
+                    player.sendMessage("§cDu kannst nur deine eigenen Zonen verwalten!");
+                    return true;
+                }
+
+                if (args[0].equalsIgnoreCase("reset")) {
+                    zoneManager.restoreZoneBackup(targetZone);
+                    player.sendMessage("§aZone wurde zurückgesetzt.");
+                } else {
+                    zoneManager.removeZone(targetZone);
+                    player.sendMessage("§eZone wurde gelöscht.");
+                }
+                return true;
+
+            default:
+                player.sendMessage("§cUnbekannter Befehl. Verwende: /zone create | confirm | reset | delete");
+                return true;
         }
-
-        return false;
     }
 }

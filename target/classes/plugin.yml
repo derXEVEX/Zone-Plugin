@@ -4,10 +4,15 @@ main: ZoneSystem.ZonePlugin
 api-version:
 commands:
   zone:
-    description: Erstellt und verwaltet Zonen.
-    usage: /zone <create|confirm>
+    description: Verwalte Zonen
+    usage: /<command> <create|reset> [Spielername#Zonennummer]
     permission: zone.use
+
 permissions:
   zone.use:
-    description: Erlaubt die Nutzung des Zone-Plugins.
+    description: Erlaubt die Nutzung des Zone-Plugins
     default: true
+  zone.reset.others:
+    description: Erlaubt das Zurücksetzen von Zonen anderer Spieler
+    default: op
+depend: [WorldEdit]
