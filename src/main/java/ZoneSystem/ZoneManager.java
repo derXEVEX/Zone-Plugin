@@ -38,7 +38,7 @@ public class ZoneManager {
     private final List<Zone> zones;
     private final List<SubZone> subZones = new ArrayList<>();
     private final HashMap<UUID, Zone> activeSubZoneCreations = new HashMap<>();
-
+    private final HashMap<String, ZonePermissionEntry> zonePermissions = new HashMap<>();
 
     public ZoneManager() {
         this.zoneFile = new File(ZonePlugin.getInstance().getDataFolder(), "zones.json");
@@ -380,6 +380,50 @@ public class ZoneManager {
     }
 
 
+    public void setZonePermission(UUID zoneOwner, int mainZone, Integer subZone, UUID user, ZonePermission permission, boolean value) {
+        String key = buildPermissionKey(zoneOwner, mainZone, subZone);
+        zonePermissions.putIfAbsent(key, new ZonePermissionEntry(zoneOwner, mainZone, subZone));
+
+        if (user == null) {
+            zonePermissions.get(key).setGlobalPermission(permission, value);
+        } else {
+            zonePermissions.get(key).setUserPermission(user, permission, value);
+        }
+        saveZones();
+    }
+
+    public boolean hasZonePermission(UUID user, Location loc, ZonePermission permission) {
+        SubZone subZone = getSubZoneAt(loc);
+        Zone mainZone = getZoneAt(loc);
+
+        if (mainZone == null) return false;
+        if (mainZone.isOwner(user)) return true;
+
+        if (subZone != null) {
+            String subKey = buildPermissionKey(mainZone.getOwnerUUID(), mainZone.getZoneNumber(), subZone.getSubZoneNumber());
+            if (zonePermissions.containsKey(subKey)) {
+                ZonePermissionEntry entry = zonePermissions.get(subKey);
+                Boolean result = entry.getUserPermission(user, permission);
+                if (result != null) return result;
+            }
+        }
+
+        String mainKey = buildPermissionKey(mainZone.getOwnerUUID(), mainZone.getZoneNumber(), null);
+        if (zonePermissions.containsKey(mainKey)) {
+            return zonePermissions.get(mainKey).hasPermission(user, permission);
+        }
+
+        return false;
+    }
+
+    public ZonePermissionEntry getPermissionEntry(UUID zoneOwner, int mainZone, Integer subZone) {
+        String key = buildPermissionKey(zoneOwner, mainZone, subZone);
+        return zonePermissions.get(key);
+    }
+
+    private String buildPermissionKey(UUID owner, int mainZone, Integer subZone) {
+        return subZone == null ? owner + "#" + mainZone : owner + "#" + mainZone + "." + subZone;
+    }
 
 
 }

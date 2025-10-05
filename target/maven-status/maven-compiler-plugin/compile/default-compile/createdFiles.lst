@@ -2,13 +2,15 @@ ZoneSystem\ZoneManager$1.class
 ZoneSystem\SubZoneCommand.class
 ZoneSystem\SubZone.class
 ZoneSystem\ZoneListener.class
-ZoneSystem\ZoneProtectionListener$1.class
+ZoneSystem\ZonePermission.class
+ZoneSystem\ZonePermissionEntry.class
 ZoneSystem\ZoneSelection.class
 ZoneSystem\ZonePlugin.class
 ZoneSystem\SubZoneListener.class
 ZoneSystem\ZoneCommand.class
 ZoneSystem\ZoneLimits.class
 ZoneSystem\ZoneCreateEvent.class
+ZoneSystem\ZonePermissionCommand.class
 ZoneSystem\SubZoneSelection.class
 ZoneSystem\Zone.class
 ZoneSystem\ZoneManager.class

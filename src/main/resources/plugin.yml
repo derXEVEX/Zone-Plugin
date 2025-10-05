@@ -4,13 +4,14 @@ main: ZoneSystem.ZonePlugin
 api-version: 1.21.4
 commands:
   zone:
-    description: Verwalte Zonen
-    usage: /<command> <create|reset> [Spielername#Zonennummer]
+    description: Manage zones
+    usage: /<command> <create|confirm|reset|delete|info|permissions>
     permission: zone.use
   subzone:
     description: Verwalte Subzonen
     usage: /<command> create <Spielername>#<Zonennummer>
     permission: zone.use
+
 
 permissions:
   zone.use:

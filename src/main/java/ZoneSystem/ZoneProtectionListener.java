@@ -10,6 +10,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.WanderingTrader;
+import org.bukkit.entity.Vehicle;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+
 
 public class ZoneProtectionListener implements Listener {
 
@@ -25,8 +33,10 @@ public class ZoneProtectionListener implements Listener {
         Zone zone = zoneManager.getZoneAt(event.getBlock().getLocation());
 
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
-            event.setCancelled(true);
-            player.sendActionBar("§cNo permissions for this zone!");
+            if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getBlock().getLocation(), ZonePermission.BUILD)) {
+                event.setCancelled(true);
+                player.sendActionBar("§cNo permissions for this zone!");
+            }
         }
     }
 
@@ -36,35 +46,32 @@ public class ZoneProtectionListener implements Listener {
         Zone zone = zoneManager.getZoneAt(event.getBlock().getLocation());
 
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
-            event.setCancelled(true);
-            player.sendActionBar("§cNo permissions for this zone!");
+            if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getBlock().getLocation(), ZonePermission.BUILD)) {
+                event.setCancelled(true);
+                player.sendActionBar("§cNo permissions for this zone!");
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null) return;
-
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
-        Zone zone = zoneManager.getZoneAt(event.getClickedBlock().getLocation());
+        Entity entity = event.getRightClicked();
+        Zone zone = zoneManager.getZoneAt(entity.getLocation());
 
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
-            switch (event.getClickedBlock().getType()) {
-                case CHEST, BARREL, FURNACE, CRAFTING_TABLE, ANVIL,
-                     ENCHANTING_TABLE, BREWING_STAND, ENDER_CHEST,
-                     LEVER, STONE_BUTTON, OAK_BUTTON, BIRCH_BUTTON,
-                     SPRUCE_BUTTON, JUNGLE_BUTTON, ACACIA_BUTTON,
-                     DARK_OAK_BUTTON, CRIMSON_BUTTON, WARPED_BUTTON,
-                     OAK_DOOR, BIRCH_DOOR, SPRUCE_DOOR, JUNGLE_DOOR,
-                     ACACIA_DOOR, DARK_OAK_DOOR, CRIMSON_DOOR, WARPED_DOOR,
-                     OAK_TRAPDOOR, BIRCH_TRAPDOOR, SPRUCE_TRAPDOOR,
-                     JUNGLE_TRAPDOOR, ACACIA_TRAPDOOR, DARK_OAK_TRAPDOOR,
-                     CRIMSON_TRAPDOOR, WARPED_TRAPDOOR, OAK_FENCE_GATE,
-                     BIRCH_FENCE_GATE, SPRUCE_FENCE_GATE, JUNGLE_FENCE_GATE,
-                     ACACIA_FENCE_GATE, DARK_OAK_FENCE_GATE, CRIMSON_FENCE_GATE,
-                     WARPED_FENCE_GATE -> {
+            if (entity instanceof Villager || entity instanceof WanderingTrader) {
+                if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.VILLAGER_TRADE)) {
                     event.setCancelled(true);
-                    player.sendActionBar("§cNo permissions for this zone!");
+                    player.sendActionBar("§cNo permission to trade with villagers!");
+                    return;
+                }
+            }
+
+            if (entity instanceof Animals) {
+                if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.ANIMALS_RIGHT_CLICK)) {
+                    event.setCancelled(true);
+                    player.sendActionBar("§cNo permission to interact with animals!");
                 }
             }
         }
@@ -73,12 +80,31 @@ public class ZoneProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;
-
         Zone zone = zoneManager.getZoneAt(event.getEntity().getLocation());
 
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
-            event.setCancelled(true);
-            player.sendActionBar("§cNo permissions for this zone!");
+            if (event.getEntity() instanceof Animals) {
+                if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getEntity().getLocation(), ZonePermission.ANIMALS_LEFT_CLICK)) {
+                    event.setCancelled(true);
+                    player.sendActionBar("§cNo permission to attack animals!");
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        if (!(event.getEntered() instanceof Player player)) return;
+
+        Vehicle vehicle = event.getVehicle();
+        if (vehicle.getType().name().contains("MINECART")) {
+            Zone zone = zoneManager.getZoneAt(vehicle.getLocation());
+            if (zone != null && !zone.isOwner(player.getUniqueId())) {
+                if (!zoneManager.hasZonePermission(player.getUniqueId(), vehicle.getLocation(), ZonePermission.MINECART_RIDE)) {
+                    event.setCancelled(true);
+                    player.sendActionBar("§cNo permission to ride minecarts!");
+                }
+            }
         }
     }
 

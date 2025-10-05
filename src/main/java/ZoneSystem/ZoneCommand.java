@@ -186,11 +186,16 @@ public class ZoneCommand implements CommandExecutor {
 
                 return true;
 
+            case "permissions":
+                ZonePermissionCommand permCommand = new ZonePermissionCommand();
+                return permCommand.onCommand(sender, command, label,
+                        java.util.Arrays.copyOfRange(args, 1, args.length));
+
+
 
 
             default:
-                player.sendMessage("§cUnbekannter Befehl. Verwende: /zone create | confirm | reset | delete");
+                player.sendMessage("§cUnbekannter Befehl. Verwende: /zone create | confirm | reset | delete | info | permissions");
                 return true;
         }
-    }
-}
+}}
