@@ -19,6 +19,8 @@ public class ZonePlugin extends JavaPlugin {
 
         this.zoneListener = new ZoneListener();
         getServer().getPluginManager().registerEvents(zoneListener, this);
+
+        getServer().getPluginManager().registerEvents(new ZoneProtectionListener(zoneManager), this);
     }
 
 

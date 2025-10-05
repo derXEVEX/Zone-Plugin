@@ -1,7 +1,7 @@
 name: ZonePlugin
 version: 1.0
 main: ZoneSystem.ZonePlugin
-api-version:
+api-version: 1.21.4
 commands:
   zone:
     description: Verwalte Zonen
