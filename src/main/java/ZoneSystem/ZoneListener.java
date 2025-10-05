@@ -79,7 +79,7 @@ public class ZoneListener implements Listener {
             currentPlayerZones.put(playerId, newZone);
 
             BossBar bossBar = activeBossBars.get(playerId);
-            String zoneName = "Zone von " + newZone.getOwnerName();
+            String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
                 activeBossBars.put(playerId, bossBar);
@@ -108,7 +108,7 @@ public class ZoneListener implements Listener {
 
         if (playerZone != null) {
             currentPlayerZones.put(playerId, playerZone);
-            String zoneName = "Zone von " + playerZone.getOwnerName();
+            String zoneName = "Zone: " + playerZone.getOwnerName() + "#" + playerZone.getZoneNumber();
 
             BossBar bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
             bossBar.addPlayer(player);

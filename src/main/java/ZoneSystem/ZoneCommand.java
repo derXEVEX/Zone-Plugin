@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.List;
 import java.util.UUID;
 
 public class ZoneCommand implements CommandExecutor {
@@ -110,10 +111,56 @@ public class ZoneCommand implements CommandExecutor {
                     zoneManager.restoreZoneBackup(targetZone);
                     player.sendMessage("§aZone wurde zurückgesetzt.");
                 } else {
+                    int freedArea = targetZone.getArea();
                     zoneManager.removeZone(targetZone);
+
+                    int remainingZones = zoneManager.getZonesForPlayer(targetZone.getOwnerUUID()).size();
+                    int remainingArea = zoneManager.getTotalAreaForPlayer(targetZone.getOwnerUUID());
+
                     player.sendMessage("§eZone wurde gelöscht.");
+                    player.sendMessage("§aFreigegebene Fläche: " + freedArea + " Blöcke");
+                    player.sendMessage("§7Deine Zonen: " + remainingZones + "/" + ZoneLimits.MAX_ZONES_PER_PLAYER);
+                    player.sendMessage("§7Deine Fläche: " + remainingArea + "/" + ZoneLimits.MAX_TOTAL_AREA);
                 }
+
                 return true;
+
+            case "info":
+                Zone currentZone = zoneManager.getZoneAt(player.getLocation());
+
+                if (currentZone != null) {
+                    player.sendMessage("§6§l=== Zone Info ===");
+                    player.sendMessage("§eOwner: §f" + currentZone.getOwnerName());
+                    player.sendMessage("§eZone: §f#" + currentZone.getZoneNumber());
+                    player.sendMessage("§eGröße: §f" + currentZone.getArea() + " Blöcke");
+                    player.sendMessage("§6§l================");
+                } else {
+                    player.sendMessage("§7Du befindest dich auf keiner Zone.");
+                }
+
+                player.sendMessage("");
+                player.sendMessage("§6§l=== Deine Zonen ===");
+
+                List<Zone> playerZones = zoneManager.getZonesForPlayer(playerId);
+                int totalUsedArea = zoneManager.getTotalAreaForPlayer(playerId);
+                int freeArea = ZoneLimits.MAX_TOTAL_AREA - totalUsedArea;
+
+                if (playerZones.isEmpty()) {
+                    player.sendMessage("§7Du besitzt keine Zonen.");
+                } else {
+                    for (Zone z : playerZones) {
+                        player.sendMessage("§e" + player.getName() + "#" + z.getZoneNumber() + " §7- §f" + z.getArea() + " Blöcke");
+                    }
+                }
+
+                player.sendMessage("");
+                player.sendMessage("§eZonen: §f" + playerZones.size() + "/" + ZoneLimits.MAX_ZONES_PER_PLAYER);
+                player.sendMessage("§eFläche: §f" + totalUsedArea + "/" + ZoneLimits.MAX_TOTAL_AREA + " Blöcke");
+                player.sendMessage("§aFreie Fläche: §f" + freeArea + " Blöcke");
+                player.sendMessage("§6§l==================");
+
+                return true;
+
 
             default:
                 player.sendMessage("§cUnbekannter Befehl. Verwende: /zone create | confirm | reset | delete");
