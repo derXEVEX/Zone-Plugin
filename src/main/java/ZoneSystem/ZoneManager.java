@@ -249,4 +249,25 @@ public class ZoneManager {
         }
     }
 
+    public int getTotalAreaForPlayer(UUID playerId) {
+        return zones.stream()
+                .filter(zone -> zone.getOwnerUUID().equals(playerId))
+                .mapToInt(Zone::getArea)
+                .sum();
+    }
+
+    public boolean canPlayerCreateZone(UUID playerId, Zone newZone) {
+        List<Zone> playerZones = getZonesForPlayer(playerId);
+
+        if (playerZones.size() >= ZoneLimits.MAX_ZONES_PER_PLAYER) {
+            return false;
+        }
+
+        int currentArea = getTotalAreaForPlayer(playerId);
+        int newZoneArea = newZone.getArea();
+
+        return (currentArea + newZoneArea) <= ZoneLimits.MAX_TOTAL_AREA;
+    }
+
+
 }

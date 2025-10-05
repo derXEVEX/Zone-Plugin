@@ -24,4 +24,12 @@ public class ZoneSelection {
         if (!isComplete()) return null;
         return new Zone(owner, name, x1, z1, x2, z2);
     }
+
+    public boolean isValidSize() {
+        if (!isComplete()) return false;
+        int length = Math.abs(x2 - x1) + 1;
+        int width = Math.abs(z2 - z1) + 1;
+        return length >= ZoneLimits.MIN_ZONE_SIZE && width >= ZoneLimits.MIN_ZONE_SIZE;
+    }
+
 }

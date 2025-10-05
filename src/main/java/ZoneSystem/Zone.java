@@ -91,6 +91,12 @@ public class Zone {
         return this.y2;
     }
 
+    public int getArea() {
+        int length = x2 - x1 + 1;
+        int width = z2 - z1 + 1;
+        return length * width;
+    }
+
 
 
 

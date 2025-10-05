@@ -39,18 +39,39 @@ public class ZoneCommand implements CommandExecutor {
                     return true;
                 }
 
+                if (!selection.isValidSize()) {
+                    player.sendMessage("§cDie Zone muss mindestens 8x8 Blöcke groß sein!");
+                    return true;
+                }
+
                 Zone zone = selection.toZone(playerId, player.getName());
+
+                if (!zoneManager.canPlayerCreateZone(playerId, zone)) {
+                    int currentZones = zoneManager.getZonesForPlayer(playerId).size();
+                    int currentArea = zoneManager.getTotalAreaForPlayer(playerId);
+                    int newArea = zone.getArea();
+
+                    if (currentZones >= ZoneLimits.MAX_ZONES_PER_PLAYER) {
+                        player.sendMessage("§cDu hast bereits die maximale Anzahl von " + ZoneLimits.MAX_ZONES_PER_PLAYER + " Zonen erreicht!");
+                    } else {
+                        player.sendMessage("§cDiese Zone würde dein Flächenlimit überschreiten!");
+                        player.sendMessage("§eDeine Fläche: " + currentArea + "/" + ZoneLimits.MAX_TOTAL_AREA);
+                        player.sendMessage("§eNeue Zone: " + newArea + " Blöcke");
+                    }
+                    return true;
+                }
+
                 if (!zoneManager.canCreateZone(zone)) {
                     player.sendMessage("§cDiese Zone überschneidet sich mit einer anderen!");
                     return true;
                 }
 
                 zoneManager.addZone(zone);
-                // Event auslösen
                 Bukkit.getPluginManager().callEvent(new ZoneCreateEvent(zone));
                 player.getInventory().removeItem(plugin.getZoneTool());
-                player.sendMessage("§aZone erfolgreich erstellt!");
+                player.sendMessage("§aZone erfolgreich erstellt! (" + zone.getArea() + " Blöcke)");
                 return true;
+
 
             case "reset":
             case "delete":

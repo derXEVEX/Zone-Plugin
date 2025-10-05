@@ -33,6 +33,8 @@ public class ZoneListener implements Listener {
 
         if (player.getInventory().getItemInMainHand().getType() != Material.STICK) return;
 
+        event.setCancelled(true);
+
         selections.putIfAbsent(playerId, new ZoneSelection());
         ZoneSelection selection = selections.get(playerId);
 
