@@ -29,11 +29,15 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import java.util.HashMap;
+
 
 public class ZoneManager {
     private final File zoneFile;
     private final Gson gson;
     private final List<Zone> zones;
+    private final List<SubZone> subZones = new ArrayList<>();
+    private final HashMap<UUID, Zone> activeSubZoneCreations = new HashMap<>();
 
 
     public ZoneManager() {
@@ -145,8 +149,7 @@ public class ZoneManager {
             return;
         }
 
-        // Logging hinzufügen
-        ZonePlugin.getInstance().getLogger().info("Creating backup for zone " + zone.getZoneNumber() + 
+        ZonePlugin.getInstance().getLogger().info("Creating backup for zone " + zone.getZoneNumber() +
             " owned by " + zone.getOwnerName());
         ZonePlugin.getInstance().getLogger().info("Backup file: " + schematicFile.getAbsolutePath());
 
@@ -268,6 +271,115 @@ public class ZoneManager {
 
         return (currentArea + newZoneArea) <= ZoneLimits.MAX_TOTAL_AREA;
     }
+
+    public void addSubZone(SubZone subZone) {
+        subZones.add(subZone);
+        saveZones();
+    }
+
+    public int getNextSubZoneNumber(UUID ownerUUID, int mainZoneNumber) {
+        return (int) subZones.stream()
+                .filter(sz -> sz.getOwnerUUID().equals(ownerUUID) && sz.getMainZoneNumber() == mainZoneNumber)
+                .count() + 1;
+    }
+
+    public boolean isSubZoneWithinMainZone(SubZone subZone, Zone mainZone) {
+        return subZone.getMinX() >= mainZone.getMinX() &&
+                subZone.getMaxX() <= mainZone.getMaxX() &&
+                subZone.getMinZ() >= mainZone.getMinZ() &&
+                subZone.getMaxZ() <= mainZone.getMaxZ() &&
+                subZone.getMinY() >= mainZone.getY1() &&
+                subZone.getMaxY() <= mainZone.getY2();
+    }
+
+    public void setActiveSubZoneCreation(UUID playerId, Zone mainZone) {
+        activeSubZoneCreations.put(playerId, mainZone);
+    }
+
+    public Zone getActiveSubZoneCreation(UUID playerId) {
+        return activeSubZoneCreations.get(playerId);
+    }
+
+    public void clearActiveSubZoneCreation(UUID playerId) {
+        activeSubZoneCreations.remove(playerId);
+    }
+
+    public SubZone getSubZoneAt(Location loc) {
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+
+        return subZones.stream()
+                .filter(sz -> sz.isInside(x, y, z))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public SubZone getSubZoneByNumbers(String playerName, int mainZoneNumber, int subZoneNumber) {
+        Player player = Bukkit.getPlayer(playerName);
+        UUID targetUUID = null;
+
+        if (player != null) {
+            targetUUID = player.getUniqueId();
+        } else {
+            Optional<UUID> offlineUUID = Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> p.getName() != null && p.getName().equalsIgnoreCase(playerName))
+                    .map(OfflinePlayer::getUniqueId)
+                    .findFirst();
+
+            if (offlineUUID.isPresent()) {
+                targetUUID = offlineUUID.get();
+            }
+        }
+
+        if (targetUUID == null) return null;
+
+        UUID finalTargetUUID = targetUUID;
+        return subZones.stream()
+                .filter(sz -> sz.getOwnerUUID().equals(finalTargetUUID) &&
+                        sz.getMainZoneNumber() == mainZoneNumber &&
+                        sz.getSubZoneNumber() == subZoneNumber)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void removeSubZone(SubZone subZone) {
+        subZones.remove(subZone);
+        saveZones();
+    }
+
+    public int getSubZoneCountForZone(UUID ownerUUID, int mainZoneNumber) {
+        return (int) subZones.stream()
+                .filter(sz -> sz.getOwnerUUID().equals(ownerUUID) &&
+                        sz.getMainZoneNumber() == mainZoneNumber)
+                .count();
+    }
+
+
+    public boolean canCreateSubZone(SubZone newSubZone) {
+        return subZones.stream()
+                .noneMatch(existingSubZone -> subZonesOverlap(existingSubZone, newSubZone));
+    }
+
+    private boolean subZonesOverlap(SubZone sz1, SubZone sz2) {
+        return sz1.getMinX() <= sz2.getMaxX() && sz1.getMaxX() >= sz2.getMinX() &&
+                sz1.getMinY() <= sz2.getMaxY() && sz1.getMaxY() >= sz2.getMinY() &&
+                sz1.getMinZ() <= sz2.getMaxZ() && sz1.getMaxZ() >= sz2.getMinZ();
+    }
+
+    public void removeZoneWithSubZones(Zone zone) {
+        List<SubZone> zonesToRemove = subZones.stream()
+                .filter(sz -> sz.getOwnerUUID().equals(zone.getOwnerUUID()) &&
+                        sz.getMainZoneNumber() == zone.getZoneNumber())
+                .toList();
+
+        subZones.removeAll(zonesToRemove);
+
+        zones.remove(zone);
+        saveZones();
+    }
+
+
 
 
 }

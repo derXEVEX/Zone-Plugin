@@ -7,6 +7,10 @@ commands:
     description: Verwalte Zonen
     usage: /<command> <create|reset> [Spielername#Zonennummer]
     permission: zone.use
+  subzone:
+    description: Verwalte Subzonen
+    usage: /<command> create <Spielername>#<Zonennummer>
+    permission: zone.use
 
 permissions:
   zone.use:

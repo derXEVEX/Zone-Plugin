@@ -1,11 +1,15 @@
 name: ZonePlugin
 version: 1.0
 main: ZoneSystem.ZonePlugin
-api-version:
+api-version: 1.21.4
 commands:
   zone:
     description: Verwalte Zonen
     usage: /<command> <create|reset> [Spielername#Zonennummer]
+    permission: zone.use
+  subzone:
+    description: Verwalte Subzonen
+    usage: /<command> create <Spielername>#<Zonennummer>
     permission: zone.use
 
 permissions:

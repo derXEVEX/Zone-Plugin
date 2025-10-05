@@ -72,31 +72,49 @@ public class ZoneListener implements Listener {
             return;
         }
 
+        SubZone newSubZone = zoneManager.getSubZoneAt(player.getLocation());
         Zone newZone = zoneManager.getZoneAt(player.getLocation());
         Zone oldZone = currentPlayerZones.get(playerId);
 
-        if (newZone != null && !newZone.equals(oldZone)) {
-            currentPlayerZones.put(playerId, newZone);
+        BossBar bossBar = activeBossBars.get(playerId);
 
-            BossBar bossBar = activeBossBars.get(playerId);
+        if (newSubZone != null) {
+            // Spieler ist in einer Subzone
+            currentPlayerZones.put(playerId, newZone);
+            String zoneName = "SubZone: " + newSubZone.getOwnerName() + "#" + newSubZone.getFullZoneName();
+
+            if (bossBar == null) {
+                bossBar = Bukkit.createBossBar(zoneName, BarColor.YELLOW, BarStyle.SOLID);
+                activeBossBars.put(playerId, bossBar);
+            } else {
+                bossBar.setTitle(zoneName);
+                bossBar.setColor(BarColor.YELLOW);
+            }
+            bossBar.addPlayer(player);
+
+        } else if (newZone != null && !newZone.equals(oldZone)) {
+            currentPlayerZones.put(playerId, newZone);
             String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
+
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
                 activeBossBars.put(playerId, bossBar);
             } else {
                 bossBar.setTitle(zoneName);
+                bossBar.setColor(BarColor.GREEN);
             }
             bossBar.addPlayer(player);
 
-        } else if (newZone == null && oldZone != null) {
+        } else if (newZone == null && newSubZone == null && oldZone != null) {
+            // Spieler hat Zone verlassen
             currentPlayerZones.remove(playerId);
-
-            BossBar bossBar = activeBossBars.remove(playerId);
-            if (bossBar != null) {
-                bossBar.removePlayer(player);
+            BossBar oldBar = activeBossBars.remove(playerId);
+            if (oldBar != null) {
+                oldBar.removePlayer(player);
             }
         }
     }
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

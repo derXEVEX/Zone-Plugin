@@ -8,6 +8,7 @@ public class ZonePlugin extends JavaPlugin {
     private static ZonePlugin instance;
     private ZoneManager zoneManager;
     private ZoneListener zoneListener;
+    private SubZoneListener subZoneListener;
 
     @Override
     public void onEnable() {
@@ -16,13 +17,17 @@ public class ZonePlugin extends JavaPlugin {
         zoneManager.loadZones();
 
         getCommand("zone").setExecutor(new ZoneCommand());
+        getCommand("subzone").setExecutor(new SubZoneCommand());
 
         this.zoneListener = new ZoneListener();
+        this.subZoneListener = new SubZoneListener();
+
+
         getServer().getPluginManager().registerEvents(zoneListener, this);
-
+        getServer().getPluginManager().registerEvents(subZoneListener, this);
         getServer().getPluginManager().registerEvents(new ZoneProtectionListener(zoneManager), this);
-    }
 
+    }
 
     @Override
     public void onDisable() {
@@ -37,12 +42,20 @@ public class ZonePlugin extends JavaPlugin {
         return zoneManager;
     }
 
+    public ZoneListener getZoneListener() {
+        return zoneListener;
+    }
+
+    public SubZoneListener getSubZoneListener() {
+        return subZoneListener;
+    }
+
     public ItemStack getZoneTool() {
         return ZoneListener.getZoneTool();
     }
 
-    public ZoneListener getZoneListener() {
-        return this.zoneListener;
+    public ItemStack getSubZoneTool() {
+        return SubZoneListener.getSubZoneTool();
     }
 
 

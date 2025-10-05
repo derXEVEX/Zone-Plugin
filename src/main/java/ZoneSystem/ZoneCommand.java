@@ -112,27 +112,50 @@ public class ZoneCommand implements CommandExecutor {
                     player.sendMessage("§aZone wurde zurückgesetzt.");
                 } else {
                     int freedArea = targetZone.getArea();
-                    zoneManager.removeZone(targetZone);
+
+                    int subZoneCount = zoneManager.getSubZoneCountForZone(
+                            targetZone.getOwnerUUID(),
+                            targetZone.getZoneNumber()
+                    );
+
+                    zoneManager.removeZoneWithSubZones(targetZone);
 
                     int remainingZones = zoneManager.getZonesForPlayer(targetZone.getOwnerUUID()).size();
                     int remainingArea = zoneManager.getTotalAreaForPlayer(targetZone.getOwnerUUID());
 
                     player.sendMessage("§eZone wurde gelöscht.");
+                    if (subZoneCount > 0) {
+                        player.sendMessage("§6" + subZoneCount + " Subzone(n) wurden automatisch mitgelöscht.");
+                    }
                     player.sendMessage("§aFreigegebene Fläche: " + freedArea + " Blöcke");
                     player.sendMessage("§7Deine Zonen: " + remainingZones + "/" + ZoneLimits.MAX_ZONES_PER_PLAYER);
                     player.sendMessage("§7Deine Fläche: " + remainingArea + "/" + ZoneLimits.MAX_TOTAL_AREA);
                 }
 
+
                 return true;
 
             case "info":
                 Zone currentZone = zoneManager.getZoneAt(player.getLocation());
+                SubZone currentSubZone = zoneManager.getSubZoneAt(player.getLocation());
 
-                if (currentZone != null) {
+                if (currentSubZone != null) {
+                    player.sendMessage("§6§l=== SubZone Info ===");
+                    player.sendMessage("§eOwner: §f" + currentSubZone.getOwnerName());
+                    player.sendMessage("§eSubZone: §f#" + currentSubZone.getFullZoneName());
+                    player.sendMessage("§eHauptzone: §f#" + currentSubZone.getMainZoneNumber());
+                    player.sendMessage("§6§l===================");
+                } else if (currentZone != null) {
+                    int subZoneCount = zoneManager.getSubZoneCountForZone(
+                            currentZone.getOwnerUUID(),
+                            currentZone.getZoneNumber()
+                    );
+
                     player.sendMessage("§6§l=== Zone Info ===");
                     player.sendMessage("§eOwner: §f" + currentZone.getOwnerName());
                     player.sendMessage("§eZone: §f#" + currentZone.getZoneNumber());
                     player.sendMessage("§eGröße: §f" + currentZone.getArea() + " Blöcke");
+                    player.sendMessage("§eSubzonen: §f" + subZoneCount);
                     player.sendMessage("§6§l================");
                 } else {
                     player.sendMessage("§7Du befindest dich auf keiner Zone.");
@@ -149,7 +172,9 @@ public class ZoneCommand implements CommandExecutor {
                     player.sendMessage("§7Du besitzt keine Zonen.");
                 } else {
                     for (Zone z : playerZones) {
-                        player.sendMessage("§e" + player.getName() + "#" + z.getZoneNumber() + " §7- §f" + z.getArea() + " Blöcke");
+                        int szCount = zoneManager.getSubZoneCountForZone(playerId, z.getZoneNumber());
+                        player.sendMessage("§e" + player.getName() + "#" + z.getZoneNumber() +
+                                " §7- §f" + z.getArea() + " Blöcke §7(§6" + szCount + " Subzonen§7)");
                     }
                 }
 
@@ -160,6 +185,7 @@ public class ZoneCommand implements CommandExecutor {
                 player.sendMessage("§6§l==================");
 
                 return true;
+
 
 
             default:
