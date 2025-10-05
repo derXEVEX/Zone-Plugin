@@ -68,49 +68,75 @@ public class ZoneListener implements Listener {
         ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
 
         if (event.getFrom().getBlockX() == event.getTo().getBlockX()
+                && event.getFrom().getBlockY() == event.getTo().getBlockY()
                 && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
         }
 
-        SubZone newSubZone = zoneManager.getSubZoneAt(player.getLocation());
-        Zone newZone = zoneManager.getZoneAt(player.getLocation());
+        SubZone oldSubZone = zoneManager.getSubZoneAt(event.getFrom());
+        SubZone newSubZone = zoneManager.getSubZoneAt(event.getTo());
+        Zone newZone = zoneManager.getZoneAt(event.getTo());
         Zone oldZone = currentPlayerZones.get(playerId);
-
         BossBar bossBar = activeBossBars.get(playerId);
 
         if (newSubZone != null) {
-            // Spieler ist in einer Subzone
             currentPlayerZones.put(playerId, newZone);
             String zoneName = "SubZone: " + newSubZone.getOwnerName() + "#" + newSubZone.getFullZoneName();
 
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.YELLOW, BarStyle.SOLID);
                 activeBossBars.put(playerId, bossBar);
+                bossBar.addPlayer(player);
             } else {
                 bossBar.setTitle(zoneName);
                 bossBar.setColor(BarColor.YELLOW);
             }
-            bossBar.addPlayer(player);
+            return;
+        }
 
-        } else if (newZone != null && !newZone.equals(oldZone)) {
+        // Fall 2: Spieler hat Subzone verlassen → jetzt in normaler Zone
+        if (oldSubZone != null && newZone != null) {
             currentPlayerZones.put(playerId, newZone);
             String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
 
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
                 activeBossBars.put(playerId, bossBar);
+                bossBar.addPlayer(player);
             } else {
                 bossBar.setTitle(zoneName);
                 bossBar.setColor(BarColor.GREEN);
             }
-            bossBar.addPlayer(player);
+            return;
+        }
 
-        } else if (newZone == null && newSubZone == null && oldZone != null) {
-            // Spieler hat Zone verlassen
+        // Fall 3: Spieler ist in normaler Zone (und war nicht in Subzone)
+        if (newZone != null) {
+            boolean zoneChanged = !newZone.equals(oldZone);
+
+            if (zoneChanged) {
+                currentPlayerZones.put(playerId, newZone);
+                String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
+
+                if (bossBar == null) {
+                    bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
+                    activeBossBars.put(playerId, bossBar);
+                    bossBar.addPlayer(player);
+                } else {
+                    bossBar.setTitle(zoneName);
+                    bossBar.setColor(BarColor.GREEN);
+                }
+            }
+            return;
+        }
+
+        // Fall 4: Spieler hat Zone/Subzone komplett verlassen
+        if (oldZone != null) {
             currentPlayerZones.remove(playerId);
             BossBar oldBar = activeBossBars.remove(playerId);
             if (oldBar != null) {
                 oldBar.removePlayer(player);
+                oldBar.removeAll();
             }
         }
     }
