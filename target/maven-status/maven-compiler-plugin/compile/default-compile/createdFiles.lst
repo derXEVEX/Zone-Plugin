@@ -4,7 +4,9 @@ ZoneSystem\SubZone.class
 ZoneSystem\ZoneListener.class
 ZoneSystem\ZonePermission.class
 ZoneSystem\ZonePermissionEntry.class
+ZoneSystem\SubZoneTabCompleter.class
 ZoneSystem\ZoneSelection.class
+ZoneSystem\ZoneTabCompleter.class
 ZoneSystem\ZonePlugin.class
 ZoneSystem\SubZoneListener.class
 ZoneSystem\ZoneCommand.class

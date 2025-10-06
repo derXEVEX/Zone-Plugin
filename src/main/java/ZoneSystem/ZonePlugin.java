@@ -17,7 +17,11 @@ public class ZonePlugin extends JavaPlugin {
         zoneManager.loadZones();
 
         getCommand("zone").setExecutor(new ZoneCommand());
+        getCommand("zone").setTabCompleter(new ZoneTabCompleter());
+
+
         getCommand("subzone").setExecutor(new SubZoneCommand());
+        getCommand("subzone").setTabCompleter(new SubZoneTabCompleter());
 
         this.zoneListener = new ZoneListener();
         this.subZoneListener = new SubZoneListener();

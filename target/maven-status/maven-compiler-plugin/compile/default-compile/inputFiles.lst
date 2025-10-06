@@ -2,6 +2,7 @@ C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\SubZone.jav
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\SubZoneCommand.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\SubZoneListener.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\SubZoneSelection.java
+C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\SubZoneTabCompleter.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\Zone.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZoneCommand.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZoneCreateEvent.java
@@ -14,3 +15,4 @@ C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZonePermiss
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZonePlugin.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZoneProtectionListener.java
 C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZoneSelection.java
+C:\Users\jano3\Desktop\IntelliJ\Zone-Plugin\src\main\java\ZoneSystem\ZoneTabCompleter.java

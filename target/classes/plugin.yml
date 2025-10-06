@@ -1,23 +1,26 @@
-name: ZonePlugin
-version: 1.0
+name: ZoneSystem
+version: '1.0-SNAPSHOT'
 main: ZoneSystem.ZonePlugin
-api-version: 1.21.4
+api-version: '1.21'
+description: A zone management system for Minecraft servers
+
 commands:
   zone:
     description: Manage zones
-    usage: /<command> <create|confirm|reset|delete|info|permissions>
+    usage: /zone <create|confirm|reset|delete|info|permissions>
     permission: zone.use
   subzone:
-    description: Verwalte Subzonen
-    usage: /<command> create <Spielername>#<Zonennummer>
-    permission: zone.use
-
+    description: Manage subzones
+    usage: /subzone <create|confirm|delete>
+    permission: zone.subzone.use
 
 permissions:
   zone.use:
-    description: Erlaubt die Nutzung des Zone-Plugins
+    description: Allows using the zone command
+    default: true
+  zone.subzone.use:
+    description: Allows using the subzone command
     default: true
   zone.reset.others:
-    description: Erlaubt das Zurücksetzen von Zonen anderer Spieler
+    description: Allows resetting zones of other players
     default: op
-depend: [WorldEdit]
