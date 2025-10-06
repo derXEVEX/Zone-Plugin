@@ -41,15 +41,27 @@ public class SubZoneListener implements Listener {
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             selection.setPosition1(x, y, z);
             player.sendMessage("§aErste Position gesetzt: §f" + x + ", " + y + ", " + z);
+            if (selection.isComplete()) {
+                ZonePlugin.getInstance().getSubZoneVisualizer().startVisualization(player, selection);
+            }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             selection.setPosition2(x, y, z);
             player.sendMessage("§aZweite Position gesetzt: §f" + x + ", " + y + ", " + z);
+            if (selection.isComplete()) {
+                ZonePlugin.getInstance().getSubZoneVisualizer().startVisualization(player, selection);
+            }
         }
+    }
+
+
+    public void clearSelection(UUID playerId) {
+        selections.remove(playerId);
     }
 
     public SubZoneSelection getSelection(UUID playerId) {
         return selections.get(playerId);
     }
+
 
     public static ItemStack getSubZoneTool() {
         ItemStack tool = new ItemStack(Material.BLAZE_ROD);

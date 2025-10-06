@@ -32,4 +32,8 @@ public class ZoneSelection {
         return length >= ZoneLimits.MIN_ZONE_SIZE && width >= ZoneLimits.MIN_ZONE_SIZE;
     }
 
+    public Integer getX1() { return x1; }
+    public Integer getZ1() { return z1; }
+    public Integer getX2() { return x2; }
+    public Integer getZ2() { return z2; }
 }

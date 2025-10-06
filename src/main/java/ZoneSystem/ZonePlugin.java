@@ -9,11 +9,15 @@ public class ZonePlugin extends JavaPlugin {
     private ZoneManager zoneManager;
     private ZoneListener zoneListener;
     private SubZoneListener subZoneListener;
+    private ZoneVisualizer zoneVisualizer;
+    private SubZoneVisualizer subZoneVisualizer;
 
     @Override
     public void onEnable() {
         instance = this;
         this.zoneManager = new ZoneManager();
+        this.zoneVisualizer = new ZoneVisualizer();
+        this.subZoneVisualizer = new SubZoneVisualizer();
         zoneManager.loadZones();
 
         getCommand("zone").setExecutor(new ZoneCommand());
@@ -61,6 +65,10 @@ public class ZonePlugin extends JavaPlugin {
     public ItemStack getSubZoneTool() {
         return SubZoneListener.getSubZoneTool();
     }
+
+    public ZoneVisualizer getZoneVisualizer() { return zoneVisualizer; }
+
+    public SubZoneVisualizer getSubZoneVisualizer() { return subZoneVisualizer; }
 
 
 }

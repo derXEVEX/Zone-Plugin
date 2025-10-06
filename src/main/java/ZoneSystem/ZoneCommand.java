@@ -69,6 +69,8 @@ public class ZoneCommand implements CommandExecutor {
 
                 zoneManager.addZone(zone);
                 Bukkit.getPluginManager().callEvent(new ZoneCreateEvent(zone));
+                listener.clearSelection(playerId);
+                plugin.getZoneVisualizer().stopVisualization(player);
                 player.getInventory().removeItem(plugin.getZoneTool());
                 player.sendMessage("§aZone erfolgreich erstellt! (" + zone.getArea() + " Blöcke)");
                 return true;
@@ -190,6 +192,14 @@ public class ZoneCommand implements CommandExecutor {
                 ZonePermissionCommand permCommand = new ZonePermissionCommand();
                 return permCommand.onCommand(sender, command, label,
                         java.util.Arrays.copyOfRange(args, 1, args.length));
+
+            case "cancel":
+                listener.clearSelection(playerId);
+                plugin.getZoneVisualizer().stopVisualization(player);
+                player.getInventory().removeItem(plugin.getZoneTool());
+                player.sendMessage("§eZone-Erstellung abgebrochen.");
+                return true;
+
 
 
 

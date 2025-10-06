@@ -9,10 +9,12 @@ commands:
     description: Manage zones
     usage: /zone <create|confirm|reset|delete|info|permissions>
     permission: zone.use
+    tab-completer: ZoneSystem.ZoneTabCompleter
   subzone:
     description: Manage subzones
     usage: /subzone <create|confirm|delete>
     permission: zone.subzone.use
+    tab-completer: ZoneSystem.SubZoneTabCompleter
 
 permissions:
   zone.use:

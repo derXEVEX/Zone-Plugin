@@ -3,6 +3,7 @@ ZoneSystem\SubZoneCommand.class
 ZoneSystem\SubZone.class
 ZoneSystem\ZoneListener.class
 ZoneSystem\ZonePermission.class
+ZoneSystem\SubZoneVisualizer$1.class
 ZoneSystem\ZonePermissionEntry.class
 ZoneSystem\SubZoneTabCompleter.class
 ZoneSystem\ZoneSelection.class
@@ -13,7 +14,10 @@ ZoneSystem\ZoneCommand.class
 ZoneSystem\ZoneLimits.class
 ZoneSystem\ZoneCreateEvent.class
 ZoneSystem\ZonePermissionCommand.class
+ZoneSystem\ZoneVisualizer$1.class
+ZoneSystem\ZoneVisualizer.class
 ZoneSystem\SubZoneSelection.class
 ZoneSystem\Zone.class
+ZoneSystem\SubZoneVisualizer.class
 ZoneSystem\ZoneManager.class
 ZoneSystem\ZoneProtectionListener.class

@@ -103,6 +103,8 @@ public class SubZoneCommand implements CommandExecutor {
 
             zoneManager.addSubZone(subZone);
             zoneManager.clearActiveSubZoneCreation(playerId);
+            plugin.getSubZoneListener().clearSelection(playerId);
+            plugin.getSubZoneVisualizer().stopVisualization(player);
             player.getInventory().removeItem(plugin.getSubZoneTool());
             player.sendMessage("§aSubzone " + targetMainZone.getOwnerName() + "#" + subZone.getFullZoneName() + " erstellt!");
             return true;
@@ -152,6 +154,16 @@ public class SubZoneCommand implements CommandExecutor {
             player.sendMessage("§aSubzone " + targetPlayer + "#" + mainZoneNumber + "." + subZoneNumber + " gelöscht!");
             return true;
         }
+
+        if (args[0].equalsIgnoreCase("cancel")) {
+            zoneManager.clearActiveSubZoneCreation(playerId);
+            plugin.getSubZoneListener().clearSelection(playerId);
+            plugin.getSubZoneVisualizer().stopVisualization(player);
+            player.getInventory().removeItem(plugin.getSubZoneTool());
+            player.sendMessage("§eSubzone-Erstellung abgebrochen.");
+            return true;
+        }
+
 
 
         return true;

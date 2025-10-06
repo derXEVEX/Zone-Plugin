@@ -5,6 +5,14 @@ import java.util.UUID;
 public class SubZoneSelection {
     private Integer x1, y1, z1, x2, y2, z2;
 
+    public Integer getX1() { return x1; }
+    public Integer getY1() { return y1; }
+    public Integer getZ1() { return z1; }
+    public Integer getX2() { return x2; }
+    public Integer getY2() { return y2; }
+    public Integer getZ2() { return z2; }
+
+
     public void setPosition1(int x, int y, int z) {
         this.x1 = x;
         this.y1 = y;

@@ -40,12 +40,23 @@ public class ZoneListener implements Listener {
 
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             selection.setPosition1(event.getClickedBlock().getX(), event.getClickedBlock().getZ());
-            player.sendMessage("§aErste Position gesetzt!");
+            player.sendMessage("§aSet first position");
+
+            if (selection.isComplete()) {
+                ZonePlugin.getInstance().getZoneVisualizer().startVisualization(player, selection);
+                player.sendMessage("§e/zone confirm to create the zone");
+            }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             selection.setPosition2(event.getClickedBlock().getX(), event.getClickedBlock().getZ());
-            player.sendMessage("§aZweite Position gesetzt!");
+            player.sendMessage("§aSecond position set");
+
+            if (selection.isComplete()) {
+                ZonePlugin.getInstance().getZoneVisualizer().startVisualization(player, selection);
+                player.sendMessage("§e/zone confirm to create the zone");
+            }
         }
     }
+
 
     public ZoneSelection getSelection(UUID playerId) {
         return selections.get(playerId);
@@ -94,7 +105,6 @@ public class ZoneListener implements Listener {
             return;
         }
 
-        // Fall 2: Spieler hat Subzone verlassen → jetzt in normaler Zone
         if (oldSubZone != null && newZone != null) {
             currentPlayerZones.put(playerId, newZone);
             String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
@@ -110,7 +120,6 @@ public class ZoneListener implements Listener {
             return;
         }
 
-        // Fall 3: Spieler ist in normaler Zone (und war nicht in Subzone)
         if (newZone != null) {
             boolean zoneChanged = !newZone.equals(oldZone);
 
@@ -130,7 +139,6 @@ public class ZoneListener implements Listener {
             return;
         }
 
-        // Fall 4: Spieler hat Zone/Subzone komplett verlassen
         if (oldZone != null) {
             currentPlayerZones.remove(playerId);
             BossBar oldBar = activeBossBars.remove(playerId);
@@ -170,6 +178,11 @@ public class ZoneListener implements Listener {
             }
         }
     }
+
+    public void clearSelection(UUID playerId) {
+        selections.remove(playerId);
+    }
+
 
 
 }
