@@ -60,11 +60,16 @@ public class ZoneManager {
 
     public void loadZones() {
         try (FileReader reader = new FileReader(zoneFile)) {
-            Type zoneListType = new TypeToken<List<Zone>>() {
-            }.getType();
-            List<Zone> loadedZones = gson.fromJson(reader, zoneListType);
-            if (loadedZones != null) {
-                zones.addAll(loadedZones);
+            ZoneData data = gson.fromJson(reader, ZoneData.class);
+
+            zones.clear();
+            subZones.clear();
+            zonePermissions.clear();
+
+            if (data != null) {
+                if (data.zones != null) zones.addAll(data.zones);
+                if (data.subZones != null) subZones.addAll(data.subZones);
+                if (data.permissions != null) zonePermissions.putAll(data.permissions);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +78,8 @@ public class ZoneManager {
 
     public void saveZones() {
         try (FileWriter writer = new FileWriter(zoneFile)) {
-            gson.toJson(zones, writer);
+            ZoneData data = new ZoneData(zones, subZones, zonePermissions);
+            gson.toJson(data, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -423,6 +429,19 @@ public class ZoneManager {
 
     private String buildPermissionKey(UUID owner, int mainZone, Integer subZone) {
         return subZone == null ? owner + "#" + mainZone : owner + "#" + mainZone + "." + subZone;
+    }
+
+
+    private static class ZoneData {
+        List<Zone> zones;
+        List<SubZone> subZones;
+        HashMap<String, ZonePermissionEntry> permissions;
+
+        ZoneData(List<Zone> zones, List<SubZone> subZones, HashMap<String, ZonePermissionEntry> permissions) {
+            this.zones = zones;
+            this.subZones = subZones;
+            this.permissions = permissions;
+        }
     }
 
 
