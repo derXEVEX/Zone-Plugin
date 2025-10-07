@@ -21,11 +21,12 @@ public class ZoneTabCompleter implements TabCompleter {
         List<String> suggestions = new ArrayList<>();
 
         if (args.length == 1) {
-            return Arrays.asList("create", "confirm", "reset", "delete", "info", "permissions")
+            return Arrays.asList("create", "confirm", "reset", "delete", "info", "permissions", "cancel")
                     .stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
+
 
         if (args.length == 2 && (args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("delete"))) {
             return zoneManager.getZonesForPlayer(player.getUniqueId())

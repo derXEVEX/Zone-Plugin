@@ -104,17 +104,32 @@ public class ZoneCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (!targetZone.isOwner(playerId) && !player.hasPermission("zone.reset.others")) {
-                    player.sendMessage("§cDu kannst nur deine eigenen Zonen verwalten!");
-                    return true;
-                }
+                boolean isOwner = targetZone.isOwner(playerId);
 
                 if (args[0].equalsIgnoreCase("reset")) {
+                    if (!isOwner && !player.hasPermission("zone.reset.others")) {
+                        player.sendMessage("§cDu hast keine Berechtigung, fremde Zonen zurückzusetzen!");
+                        return true;
+                    }
+                    if (isOwner && !player.hasPermission("zone.reset.own")) {
+                        player.sendMessage("§cDu hast keine Berechtigung, eigene Zonen zurückzusetzen!");
+                        return true;
+                    }
+
                     zoneManager.restoreZoneBackup(targetZone);
                     player.sendMessage("§aZone wurde zurückgesetzt.");
-                } else {
-                    int freedArea = targetZone.getArea();
 
+                } else {
+                    if (!isOwner && !player.hasPermission("zone.delete.others")) {
+                        player.sendMessage("§cDu hast keine Berechtigung, fremde Zonen zu löschen!");
+                        return true;
+                    }
+                    if (isOwner && !player.hasPermission("zone.delete.own")) {
+                        player.sendMessage("§cDu hast keine Berechtigung, eigene Zonen zu löschen!");
+                        return true;
+                    }
+
+                    int freedArea = targetZone.getArea();
                     int subZoneCount = zoneManager.getSubZoneCountForZone(
                             targetZone.getOwnerUUID(),
                             targetZone.getZoneNumber()
@@ -134,8 +149,8 @@ public class ZoneCommand implements CommandExecutor {
                     player.sendMessage("§7Deine Fläche: " + remainingArea + "/" + ZoneLimits.MAX_TOTAL_AREA);
                 }
 
-
                 return true;
+
 
             case "info":
                 Zone currentZone = zoneManager.getZoneAt(player.getLocation());

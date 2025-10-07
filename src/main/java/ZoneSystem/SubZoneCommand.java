@@ -164,6 +164,11 @@ public class SubZoneCommand implements CommandExecutor {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("permissions")) {
+            SubZonePermissionCommand permCommand = new SubZonePermissionCommand();
+            return permCommand.onCommand(sender, command, label,
+                    java.util.Arrays.copyOfRange(args, 1, args.length));
+        }
 
 
         return true;

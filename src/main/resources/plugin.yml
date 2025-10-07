@@ -23,6 +23,23 @@ permissions:
   zone.subzone.use:
     description: Allows using the subzone command
     default: true
-  zone.reset.others:
-    description: Allows resetting zones of other players
+  zone.delete.own:
+    description: Erlaubt das Löschen eigener Zonen
     default: op
+  zone.delete.others:
+    description: Erlaubt das Löschen fremder Zonen
+    default: op
+  zone.reset.own:
+    description: Erlaubt das Zurücksetzen eigener Zonen
+    default: op
+  zone.reset.others:
+    description: Erlaubt das Zurücksetzen fremder Zonen
+    default: op
+  subzone.delete.own:
+    description: Erlaubt das Löschen eigener SubZonen
+    default: true
+  subzone.delete.others:
+    description: Erlaubt das Löschen fremder SubZonen
+    default: op
+
+

@@ -55,4 +55,18 @@ public class ZonePermissionEntry {
     public String getZoneIdentifier() {
         return subZoneNumber == null ? mainZoneNumber + "" : mainZoneNumber + "." + subZoneNumber;
     }
+
+    public boolean hasExplicitUserPermission(UUID user, ZonePermission permission) {
+        return userPermissions.containsKey(user) &&
+                userPermissions.get(user).containsKey(permission);
+    }
+
+    public boolean hasExplicitGlobalPermission(ZonePermission permission) {
+        return globalPermissions.containsKey(permission);
+    }
+
+    public Boolean getGlobalPermission(ZonePermission permission) {
+        return globalPermissions.get(permission);
+    }
+
 }

@@ -405,15 +405,26 @@ public class ZoneManager {
         if (mainZone == null) return false;
         if (mainZone.isOwner(user)) return true;
 
+        // Prüfe Subzone zuerst
         if (subZone != null) {
             String subKey = buildPermissionKey(mainZone.getOwnerUUID(), mainZone.getZoneNumber(), subZone.getSubZoneNumber());
             if (zonePermissions.containsKey(subKey)) {
-                ZonePermissionEntry entry = zonePermissions.get(subKey);
-                Boolean result = entry.getUserPermission(user, permission);
-                if (result != null) return result;
+                ZonePermissionEntry subEntry = zonePermissions.get(subKey);
+
+                // Wenn explizite User-Permission in Subzone existiert, verwende diese
+                if (subEntry.hasExplicitUserPermission(user, permission)) {
+                    return subEntry.getUserPermission(user, permission);
+                }
+
+                // Wenn explizite Global-Permission in Subzone existiert, verwende diese
+                if (subEntry.hasExplicitGlobalPermission(permission)) {
+                    Boolean globalPerm = subEntry.getGlobalPermission(permission);
+                    if (globalPerm != null) return globalPerm;
+                }
             }
         }
 
+        // Fallback zur Hauptzone
         String mainKey = buildPermissionKey(mainZone.getOwnerUUID(), mainZone.getZoneNumber(), null);
         if (zonePermissions.containsKey(mainKey)) {
             return zonePermissions.get(mainKey).hasPermission(user, permission);
@@ -421,6 +432,7 @@ public class ZoneManager {
 
         return false;
     }
+
 
     public ZonePermissionEntry getPermissionEntry(UUID zoneOwner, int mainZone, Integer subZone) {
         String key = buildPermissionKey(zoneOwner, mainZone, subZone);
