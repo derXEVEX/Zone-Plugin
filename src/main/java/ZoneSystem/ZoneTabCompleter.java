@@ -21,14 +21,38 @@ public class ZoneTabCompleter implements TabCompleter {
         List<String> suggestions = new ArrayList<>();
 
         if (args.length == 1) {
-            return Arrays.asList("create", "confirm", "reset", "delete", "info", "permissions", "cancel")
-                    .stream()
+            List<String> commands = new ArrayList<>();
+
+            if (player.hasPermission("zone.create")) commands.add("create");
+            if (player.hasPermission("zone.create")) commands.add("confirm");
+            if (player.hasPermission("zone.reset.own") || player.hasPermission("zone.reset.others")) commands.add("reset");
+            if (player.hasPermission("zone.delete.own") || player.hasPermission("zone.delete.others")) commands.add("delete");
+            if (player.hasPermission("zone.info")) commands.add("info");
+            if (player.hasPermission("zone.permissions")) commands.add("permissions");
+            if (player.hasPermission("zone.create")) commands.add("cancel");
+
+            return commands.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
+        if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
+            if (!player.hasPermission("zone.reset.own") && !player.hasPermission("zone.reset.others")) {
+                return suggestions;
+            }
 
-        if (args.length == 2 && (args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("delete"))) {
+            return zoneManager.getZonesForPlayer(player.getUniqueId())
+                    .stream()
+                    .map(z -> player.getName() + "#" + z.getZoneNumber())
+                    .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
+            if (!player.hasPermission("zone.delete.own") && !player.hasPermission("zone.delete.others")) {
+                return suggestions;
+            }
+
             return zoneManager.getZonesForPlayer(player.getUniqueId())
                     .stream()
                     .map(z -> player.getName() + "#" + z.getZoneNumber())
@@ -37,6 +61,10 @@ public class ZoneTabCompleter implements TabCompleter {
         }
 
         if (args[0].equalsIgnoreCase("permissions")) {
+            if (!player.hasPermission("zone.permissions")) {
+                return suggestions;
+            }
+
             if (args.length == 2) {
                 return zoneManager.getZonesForPlayer(player.getUniqueId())
                         .stream()
