@@ -3,6 +3,7 @@ package ZoneSystem;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+
 public class ZonePlugin extends JavaPlugin {
 
     private static ZonePlugin instance;
@@ -11,6 +12,7 @@ public class ZonePlugin extends JavaPlugin {
     private SubZoneListener subZoneListener;
     private ZoneVisualizer zoneVisualizer;
     private SubZoneVisualizer subZoneVisualizer;
+    private PlayerZoneVisualizer playerZoneVisualizer;
 
     @Override
     public void onEnable() {
@@ -19,6 +21,7 @@ public class ZonePlugin extends JavaPlugin {
         this.zoneVisualizer = new ZoneVisualizer();
         this.subZoneVisualizer = new SubZoneVisualizer();
         zoneManager.loadZones();
+        this.playerZoneVisualizer = new PlayerZoneVisualizer();
 
         getCommand("zone").setExecutor(new ZoneCommand());
         getCommand("zone").setTabCompleter(new ZoneTabCompleter());
@@ -69,6 +72,10 @@ public class ZonePlugin extends JavaPlugin {
     public ZoneVisualizer getZoneVisualizer() { return zoneVisualizer; }
 
     public SubZoneVisualizer getSubZoneVisualizer() { return subZoneVisualizer; }
+
+    public PlayerZoneVisualizer getPlayerZoneVisualizer() {
+        return playerZoneVisualizer;
+    }
 
 
 }

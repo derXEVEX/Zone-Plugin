@@ -13,27 +13,27 @@ public class SubZonePermissionCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cDieser Befehl kann nur von einem Spieler ausgeführt werden.");
+            sender.sendMessage("§cThis command can only be executed by a player.");
             return true;
         }
 
         ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
 
         if (args.length < 2) {
-            player.sendMessage("§cVerwendung: /subzone permissions <Spielername>#<Zone>.<SubZone> <list|set>");
+            player.sendMessage("§cUsage: /subzone permissions <PlayerName>#<Zone>.<SubZone> <list|set>");
             return true;
         }
 
         String[] parts = args[0].split("#");
         if (parts.length != 2) {
-            player.sendMessage("§cUngültiges Format. Beispiel: Spieler#1.1");
+            player.sendMessage("§cInvalid format. Example: Player#1.1");
             return true;
         }
 
         String targetPlayer = parts[0];
         String[] zoneParts = parts[1].split("\\.");
         if (zoneParts.length != 2) {
-            player.sendMessage("§cUngültiges Format. Beispiel: Spieler#1.1");
+            player.sendMessage("§cInvalid format. Example: Player#1.1");
             return true;
         }
 
@@ -42,18 +42,18 @@ public class SubZonePermissionCommand implements CommandExecutor {
             mainZoneNumber = Integer.parseInt(zoneParts[0]);
             subZoneNumber = Integer.parseInt(zoneParts[1]);
         } catch (NumberFormatException e) {
-            player.sendMessage("§cUngültige Zonennummer!");
+            player.sendMessage("§cInvalid zone number!");
             return true;
         }
 
         SubZone subZone = zoneManager.getSubZoneByNumbers(targetPlayer, mainZoneNumber, subZoneNumber);
         if (subZone == null) {
-            player.sendMessage("§cSubzone nicht gefunden!");
+            player.sendMessage("§cSubzone not found!");
             return true;
         }
 
         if (!subZone.isOwner(player.getUniqueId())) {
-            player.sendMessage("§cDu kannst nur Rechte für deine eigenen Subzonen verwalten!");
+            player.sendMessage("§cYou can only manage permissions for your own subzones!");
             return true;
         }
 
@@ -66,12 +66,12 @@ public class SubZonePermissionCommand implements CommandExecutor {
                     subZoneNumber
             );
 
-            player.sendMessage("§6§l=== Rechte für SubZone " + subZone.getFullZoneName() + " ===");
+            player.sendMessage("§6§l=== Permissions for SubZone " + subZone.getFullZoneName() + " ===");
 
             if (entry == null) {
-                player.sendMessage("§7Keine benutzerdefinierten Rechte gesetzt.");
+                player.sendMessage("§7No custom permissions set.");
             } else {
-                player.sendMessage("§eGlobale Rechte:");
+                player.sendMessage("§eGlobal Permissions:");
                 for (ZonePermission perm : ZonePermission.values()) {
                     Boolean value = entry.getGlobalPermission(perm);
                     if (value != null) {
@@ -79,7 +79,7 @@ public class SubZonePermissionCommand implements CommandExecutor {
                     }
                 }
 
-                player.sendMessage("§eBenutzer-Rechte:");
+                player.sendMessage("§eUser Permissions:");
                 entry.getUserPermissions().forEach((uuid, perms) -> {
                     String userName = Bukkit.getOfflinePlayer(uuid).getName();
                     player.sendMessage("  §b" + userName + ":");
@@ -93,7 +93,7 @@ public class SubZonePermissionCommand implements CommandExecutor {
 
         if (action.equals("set")) {
             if (args.length != 5) {
-                player.sendMessage("§cVerwendung: /subzone permissions <SubZone> set <Spieler|*> <Recht|*> <true|false>");
+                player.sendMessage("§cUsage: /subzone permissions <SubZone> set <Player|*> <Permission|*> <true|false>");
                 return true;
             }
 
@@ -105,7 +105,7 @@ public class SubZonePermissionCommand implements CommandExecutor {
             if (!targetUser.equals("*")) {
                 Player target = Bukkit.getPlayer(targetUser);
                 if (target == null) {
-                    player.sendMessage("§cSpieler nicht gefunden!");
+                    player.sendMessage("§cPlayer not found!");
                     return true;
                 }
                 targetUUID = target.getUniqueId();
@@ -122,12 +122,12 @@ public class SubZonePermissionCommand implements CommandExecutor {
                             value
                     );
                 }
-                player.sendMessage("§aAlle Rechte für " + (targetUser.equals("*") ? "alle" : targetUser) +
-                        " auf §f" + value + " §agesetzt!");
+                player.sendMessage("§aAll permissions for " + (targetUser.equals("*") ? "everyone" : targetUser) +
+                        " set to §f" + value + "§a!");
             } else {
                 ZonePermission permission = ZonePermission.fromString(permissionName);
                 if (permission == null) {
-                    player.sendMessage("§cUngültiges Recht! Verfügbare: " +
+                    player.sendMessage("§cInvalid permission! Available: " +
                             String.join(", ", java.util.Arrays.stream(ZonePermission.values())
                                     .map(ZonePermission::getKey).toArray(String[]::new)));
                     return true;
@@ -142,13 +142,13 @@ public class SubZonePermissionCommand implements CommandExecutor {
                         value
                 );
 
-                player.sendMessage("§aRecht §f" + permissionName + " §afür " +
-                        (targetUser.equals("*") ? "alle" : targetUser) + " auf §f" + value + " §agesetzt!");
+                player.sendMessage("§aPermission §f" + permissionName + " §afor " +
+                        (targetUser.equals("*") ? "everyone" : targetUser) + " set to §f" + value + "§a!");
             }
             return true;
         }
 
-        player.sendMessage("§cUnbekannter Befehl. Verwende: list | set");
+        player.sendMessage("§cUnknown command. Use: list | set");
         return true;
     }
 }

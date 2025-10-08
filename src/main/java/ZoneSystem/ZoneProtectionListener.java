@@ -26,6 +26,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.projectiles.ProjectileSource;
 
 
 
@@ -45,7 +46,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getBlock().getLocation(), ZonePermission.BUILD)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung zum Abbauen!");
+                player.sendActionBar("§cNo permission to break blocks here!");
             }
         }
     }
@@ -58,7 +59,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getBlock().getLocation(), ZonePermission.BUILD)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung zum Platzieren!");
+                player.sendActionBar("§cNo permission to place blocks here!");
             }
         }
     }
@@ -81,7 +82,7 @@ public class ZoneProtectionListener implements Listener {
         if (isContainer(type)) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), block.getLocation(), ZonePermission.INTERACT_CONTAINERS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung für Container!");
+                player.sendActionBar("§cNo permission to use containers!");
                 return;
             }
         }
@@ -90,7 +91,7 @@ public class ZoneProtectionListener implements Listener {
         if (isRedstone(type)) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), block.getLocation(), ZonePermission.USE_REDSTONE)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung für Redstone!");
+                player.sendActionBar("§cNo permission to use redstone!");
                 return;
             }
         }
@@ -99,7 +100,7 @@ public class ZoneProtectionListener implements Listener {
         if (isInteractable(type)) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), block.getLocation(), ZonePermission.INTERACT_BLOCKS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung für Interaktion!");
+                player.sendActionBar("§cKeine Berechtigung for Interactions!");
             }
         }
     }
@@ -116,7 +117,7 @@ public class ZoneProtectionListener implements Listener {
         if (entity instanceof Villager || entity instanceof WanderingTrader) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.VILLAGER_TRADE)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung zum Handeln!");
+                player.sendActionBar("§cNo permission to trade with villagers!");
                 return;
             }
         }
@@ -129,7 +130,7 @@ public class ZoneProtectionListener implements Listener {
             if (isFeedItem(item, entity)) {
                 if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.FEED_ANIMALS)) {
                     event.setCancelled(true);
-                    player.sendActionBar("§cKeine Berechtigung zum Füttern!");
+                    player.sendActionBar("§cNo permission to interact with animals!");
                     return;
                 }
             }
@@ -138,7 +139,7 @@ public class ZoneProtectionListener implements Listener {
             if (item == Material.SHEARS && entity instanceof Sheep) {
                 if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.SHEAR_ANIMALS)) {
                     event.setCancelled(true);
-                    player.sendActionBar("§cKeine Berechtigung zum Scheren!");
+                    player.sendActionBar("§cNo permission to shear!");
                     return;
                 }
             }
@@ -147,63 +148,82 @@ public class ZoneProtectionListener implements Listener {
             if (item == Material.BUCKET && (entity instanceof Cow || entity instanceof MushroomCow)) {
                 if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.MILK_ANIMALS)) {
                     event.setCancelled(true);
-                    player.sendActionBar("§cKeine Berechtigung zum Melken!");
+                    player.sendActionBar("§cNo Permission to milk!");
                     return;
                 }
             }
         }
 
-        // Item Frames
+
         if (entity instanceof ItemFrame) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.INTERACT_ITEM_FRAMES)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung für Item Frames!");
+                player.sendActionBar("§cNo permission to interact with item frames!");
+                return;
             }
         }
+
 
         if (entity instanceof ArmorStand) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.INTERACT_ARMOR_STANDS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung für Rüstungsständer!");
+                player.sendActionBar("§cNo permission to interact with armor stands!");
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player player)) return;
+        Player player = null;
+
+        if (event.getDamager() instanceof Player) {
+            player = (Player) event.getDamager();
+        }
+        else if (event.getDamager() instanceof Projectile projectile) {
+            if (projectile.getShooter() instanceof Player) {
+                player = (Player) projectile.getShooter();
+            }
+        }
+
+        if (player == null) return;
 
         Zone zone = zoneManager.getZoneAt(event.getEntity().getLocation());
         if (zone == null || zone.isOwner(player.getUniqueId())) return;
 
         Entity victim = event.getEntity();
 
+        if (victim instanceof ItemFrame) {
+            if (!zoneManager.hasZonePermission(player.getUniqueId(), victim.getLocation(), ZonePermission.INTERACT_ITEM_FRAMES)) {
+                event.setCancelled(true);
+                player.sendActionBar("§cNo permission to break item frames!");
+                return;
+            }
+        }
 
         if (victim instanceof Animals) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), victim.getLocation(), ZonePermission.DAMAGE_ANIMALS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Tiere anzugreifen!");
+                player.sendActionBar("§cNo permission to attack animals!");
                 return;
             }
         }
-
 
         if (victim instanceof Villager || victim instanceof WanderingTrader) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), victim.getLocation(), ZonePermission.DAMAGE_VILLAGERS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Dorfbewohner anzugreifen!");
+                player.sendActionBar("§cNo permission to attack villagers!");
                 return;
             }
         }
 
-
         if (victim instanceof Monster) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), victim.getLocation(), ZonePermission.DAMAGE_MONSTERS)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Monster anzugreifen!");
+                player.sendActionBar("§cNo permission to attack monsters!");
             }
         }
     }
+
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerLeashEntity(PlayerLeashEntityEvent event) {
@@ -215,9 +235,31 @@ public class ZoneProtectionListener implements Listener {
 
         if (!zoneManager.hasZonePermission(player.getUniqueId(), entity.getLocation(), ZonePermission.LEASH_ENTITIES)) {
             event.setCancelled(true);
-            player.sendActionBar("§cKeine Berechtigung Tiere anzuleinen!");
+            player.sendActionBar("§cNo permission to leash animals!");
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerTrample(PlayerInteractEvent event) {
+        if (event.getAction() != Action.PHYSICAL) return;
+
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+
+        Material type = block.getType();
+        if (type != Material.FARMLAND && type != Material.TURTLE_EGG) return;
+
+        Player player = event.getPlayer();
+        Zone zone = zoneManager.getZoneAt(block.getLocation());
+
+        if (zone != null && !zone.isOwner(player.getUniqueId())) {
+            if (!zoneManager.hasZonePermission(player.getUniqueId(), block.getLocation(), ZonePermission.BUILD)) {
+                event.setCancelled(true);
+                player.sendActionBar("§cNo permission to trample here!");
+            }
+        }
+    }
+
 
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -233,7 +275,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getClickedBlock().getLocation(), ZonePermission.PLACE_VEHICLES)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Fahrzeuge zu platzieren!");
+                player.sendActionBar("§cNo permission to place vehicles!");
             }
         }
     }
@@ -246,7 +288,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getVehicle().getLocation(), ZonePermission.BREAK_VEHICLES)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Fahrzeuge abzubauen!");
+                player.sendActionBar("§cNo permission to break vehicles!");
             }
         }
     }
@@ -259,7 +301,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getVehicle().getLocation(), ZonePermission.RIDE_VEHICLES)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung Fahrzeuge zu benutzen!");
+                player.sendActionBar("§cNo permission to use vehicles!");
             }
         }
     }
@@ -272,7 +314,7 @@ public class ZoneProtectionListener implements Listener {
         if (zone != null && !zone.isOwner(player.getUniqueId())) {
             if (!zoneManager.hasZonePermission(player.getUniqueId(), event.getEntity().getLocation(), ZonePermission.INTERACT_ITEM_FRAMES)) {
                 event.setCancelled(true);
-                player.sendActionBar("§cKeine Berechtigung!");
+                player.sendActionBar("§cNo permission");
             }
         }
     }

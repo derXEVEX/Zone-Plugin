@@ -57,7 +57,6 @@ public enum ZonePermission {
         return null;
     }
 
-    // Kategorien für bessere Übersicht
     public static ZonePermission[] getBuildPermissions() {
         return new ZonePermission[]{BUILD, INTERACT_BLOCKS, INTERACT_CONTAINERS};
     }

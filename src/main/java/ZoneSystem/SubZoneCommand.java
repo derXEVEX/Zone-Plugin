@@ -12,7 +12,7 @@ public class SubZoneCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cDieser Befehl kann nur von einem Spieler ausgeführt werden.");
+            sender.sendMessage("§cThis command can only be executed by a player.");
             return true;
         }
 
@@ -21,19 +21,19 @@ public class SubZoneCommand implements CommandExecutor {
         ZoneManager zoneManager = plugin.getZoneManager();
 
         if (args.length == 0) {
-            player.sendMessage("§cVerwendung: /subzone create <Spielername>#<Zonennummer>");
+            player.sendMessage("§cUsage: /subzone create <PlayerName>#<ZoneNumber>");
             return true;
         }
 
         if (args[0].equalsIgnoreCase("create")) {
             if (args.length != 2) {
-                player.sendMessage("§cVerwendung: /subzone create <Spielername>#<Zonennummer>");
+                player.sendMessage("§cUsage: /subzone create <PlayerName>#<ZoneNumber>");
                 return true;
             }
 
             String[] parts = args[1].split("#");
             if (parts.length != 2) {
-                player.sendMessage("§cUngültiges Format. Beispiel: aip#1");
+                player.sendMessage("§cInvalid format. Example: aip#1");
                 return true;
             }
 
@@ -42,25 +42,26 @@ public class SubZoneCommand implements CommandExecutor {
             try {
                 mainZoneNumber = Integer.parseInt(parts[1]);
             } catch (NumberFormatException e) {
-                player.sendMessage("§cUngültige Zonennummer!");
+                player.sendMessage("§cInvalid zone number!");
                 return true;
             }
 
             Zone mainZone = zoneManager.getZoneByPlayerAndNumber(targetPlayer, mainZoneNumber);
             if (mainZone == null) {
-                player.sendMessage("§cHauptzone " + targetPlayer + "#" + mainZoneNumber + " nicht gefunden!");
+                player.sendMessage("§cMain zone " + targetPlayer + "#" + mainZoneNumber + " not found!");
                 return true;
             }
 
             if (!mainZone.isOwner(playerId)) {
-                player.sendMessage("§cDu kannst nur Subzonen in deinen eigenen Zonen erstellen!");
+                player.sendMessage("§cYou can only create subzones in your own zones!");
                 return true;
             }
 
             zoneManager.setActiveSubZoneCreation(playerId, mainZone);
             player.getInventory().addItem(plugin.getSubZoneTool());
-            player.sendMessage("§aSubzone-Tool erhalten! Markiere die Eckpunkte (mit Y-Koordinaten).");
-            player.sendMessage("§7Links-Klick: Position 1 | Rechts-Klick: Position 2");
+            player.sendMessage("§aSubzone tool received! Mark the corner points (with Y coordinates).");
+            player.sendMessage("§7Left-Click: Position 1 | Right-Click: Position 2 and then /subzone confirm");
+            player.sendMessage("§e/subzone cancel to cancel the creation.");
             return true;
         }
 
@@ -69,12 +70,12 @@ public class SubZoneCommand implements CommandExecutor {
             Zone targetMainZone = zoneManager.getActiveSubZoneCreation(playerId);
 
             if (targetMainZone == null) {
-                player.sendMessage("§cKeine aktive Subzone-Erstellung!");
+                player.sendMessage("§cNo active subzone creation!");
                 return true;
             }
 
             if (selection == null || !selection.isComplete()) {
-                player.sendMessage("§cDu musst erst zwei Punkte setzen!");
+                player.sendMessage("§cYou must set two points first!");
                 return true;
             }
 
@@ -91,13 +92,13 @@ public class SubZoneCommand implements CommandExecutor {
             );
 
             if (!zoneManager.isSubZoneWithinMainZone(subZone, targetMainZone)) {
-                player.sendMessage("§cDie Subzone muss vollständig in der Hauptzone " +
-                        targetMainZone.getOwnerName() + "#" + targetMainZone.getZoneNumber() + " liegen!");
+                player.sendMessage("§cThe subzone must be completely within the main zone " +
+                        targetMainZone.getOwnerName() + "#" + targetMainZone.getZoneNumber() + "!");
                 return true;
             }
 
             if (!zoneManager.canCreateSubZone(subZone)) {
-                player.sendMessage("§cDiese Subzone überschneidet sich mit einer anderen Subzone!");
+                player.sendMessage("§cThis subzone overlaps with another subzone!");
                 return true;
             }
 
@@ -106,26 +107,26 @@ public class SubZoneCommand implements CommandExecutor {
             plugin.getSubZoneListener().clearSelection(playerId);
             plugin.getSubZoneVisualizer().stopVisualization(player);
             player.getInventory().removeItem(plugin.getSubZoneTool());
-            player.sendMessage("§aSubzone " + targetMainZone.getOwnerName() + "#" + subZone.getFullZoneName() + " erstellt!");
+            player.sendMessage("§aSubzone " + targetMainZone.getOwnerName() + "#" + subZone.getFullZoneName() + " created!");
             return true;
         }
 
         if (args[0].equalsIgnoreCase("delete")) {
             if (args.length != 2) {
-                player.sendMessage("§cVerwendung: /subzone delete <Spielername>#<Zonennummer>.<Subzonennummer>");
+                player.sendMessage("§cUsage: /subzone delete <PlayerName>#<ZoneNumber>.<SubzoneNumber>");
                 return true;
             }
 
             String[] mainParts = args[1].split("#");
             if (mainParts.length != 2) {
-                player.sendMessage("§cUngültiges Format. Beispiel: aip#1.1");
+                player.sendMessage("§cInvalid format. Example: aip#1.1");
                 return true;
             }
 
             String targetPlayer = mainParts[0];
             String[] zoneParts = mainParts[1].split("\\.");
             if (zoneParts.length != 2) {
-                player.sendMessage("§cUngültiges Format. Beispiel: aip#1.1");
+                player.sendMessage("§cInvalid format. Example: aip#1.1");
                 return true;
             }
 
@@ -135,23 +136,23 @@ public class SubZoneCommand implements CommandExecutor {
                 mainZoneNumber = Integer.parseInt(zoneParts[0]);
                 subZoneNumber = Integer.parseInt(zoneParts[1]);
             } catch (NumberFormatException e) {
-                player.sendMessage("§cUngültige Zonennummer!");
+                player.sendMessage("§cInvalid zone number!");
                 return true;
             }
 
             SubZone subZone = zoneManager.getSubZoneByNumbers(targetPlayer, mainZoneNumber, subZoneNumber);
             if (subZone == null) {
-                player.sendMessage("§cSubzone nicht gefunden!");
+                player.sendMessage("§cSubzone not found!");
                 return true;
             }
 
             if (!subZone.isOwner(playerId)) {
-                player.sendMessage("§cDu kannst nur deine eigenen Subzonen löschen!");
+                player.sendMessage("§cYou can only delete your own subzones!");
                 return true;
             }
 
             zoneManager.removeSubZone(subZone);
-            player.sendMessage("§aSubzone " + targetPlayer + "#" + mainZoneNumber + "." + subZoneNumber + " gelöscht!");
+            player.sendMessage("§aSubzone " + targetPlayer + "#" + mainZoneNumber + "." + subZoneNumber + " deleted!");
             return true;
         }
 
@@ -160,7 +161,7 @@ public class SubZoneCommand implements CommandExecutor {
             plugin.getSubZoneListener().clearSelection(playerId);
             plugin.getSubZoneVisualizer().stopVisualization(player);
             player.getInventory().removeItem(plugin.getSubZoneTool());
-            player.sendMessage("§eSubzone-Erstellung abgebrochen.");
+            player.sendMessage("§eSubzone creation cancelled.");
             return true;
         }
 

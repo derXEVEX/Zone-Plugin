@@ -411,12 +411,10 @@ public class ZoneManager {
             if (zonePermissions.containsKey(subKey)) {
                 ZonePermissionEntry subEntry = zonePermissions.get(subKey);
 
-                // Wenn explizite User-Permission in Subzone existiert, verwende diese
                 if (subEntry.hasExplicitUserPermission(user, permission)) {
                     return subEntry.getUserPermission(user, permission);
                 }
 
-                // Wenn explizite Global-Permission in Subzone existiert, verwende diese
                 if (subEntry.hasExplicitGlobalPermission(permission)) {
                     Boolean globalPerm = subEntry.getGlobalPermission(permission);
                     if (globalPerm != null) return globalPerm;
@@ -424,7 +422,6 @@ public class ZoneManager {
             }
         }
 
-        // Fallback zur Hauptzone
         String mainKey = buildPermissionKey(mainZone.getOwnerUUID(), mainZone.getZoneNumber(), null);
         if (zonePermissions.containsKey(mainKey)) {
             return zonePermissions.get(mainKey).hasPermission(user, permission);
@@ -455,6 +452,12 @@ public class ZoneManager {
             this.permissions = permissions;
         }
     }
+
+    public List<Zone> getAllZones() {
+        return new ArrayList<>(zones);
+    }
+
+
 
 
 }

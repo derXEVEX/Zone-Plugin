@@ -22,7 +22,7 @@ public class SubZoneListener implements Listener {
         UUID playerId = player.getUniqueId();
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (item.getType() != Material.BLAZE_ROD) return;
+        if (item.getType() != Material.WOODEN_HOE) return;
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null || !meta.hasDisplayName() || !meta.getDisplayName().equals("§6SubZone-Tool")) return;
@@ -40,13 +40,13 @@ public class SubZoneListener implements Listener {
 
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             selection.setPosition1(x, y, z);
-            player.sendMessage("§aErste Position gesetzt: §f" + x + ", " + y + ", " + z);
+            player.sendMessage("§aFirst position Set: §f" + x + ", " + y + ", " + z);
             if (selection.isComplete()) {
                 ZonePlugin.getInstance().getSubZoneVisualizer().startVisualization(player, selection);
             }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             selection.setPosition2(x, y, z);
-            player.sendMessage("§aZweite Position gesetzt: §f" + x + ", " + y + ", " + z);
+            player.sendMessage("§aSecond  position set§f" + x + ", " + y + ", " + z);
             if (selection.isComplete()) {
                 ZonePlugin.getInstance().getSubZoneVisualizer().startVisualization(player, selection);
             }
@@ -64,7 +64,7 @@ public class SubZoneListener implements Listener {
 
 
     public static ItemStack getSubZoneTool() {
-        ItemStack tool = new ItemStack(Material.BLAZE_ROD);
+        ItemStack tool = new ItemStack(Material.WOODEN_HOE);
         ItemMeta meta = tool.getItemMeta();
         if (meta != null) {
             meta.setDisplayName("§6SubZone-Tool");

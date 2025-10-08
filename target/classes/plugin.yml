@@ -20,6 +20,15 @@ permissions:
   zone.use:
     description: Allows using the zone command
     default: true
+  zone.create:
+    description: Allows creating zones
+    default: true
+  zone.info:
+    description: Allows viewing zone information
+    default: true
+  zone.permissions:
+    description: Allows managing zone permissions
+    default: true
   zone.subzone.use:
     description: Allows using the subzone command
     default: true
@@ -41,5 +50,6 @@ permissions:
   subzone.delete.others:
     description: Erlaubt das Löschen fremder SubZonen
     default: op
+
 
 

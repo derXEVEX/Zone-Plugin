@@ -30,11 +30,14 @@ public class ZoneTabCompleter implements TabCompleter {
             if (player.hasPermission("zone.info")) commands.add("info");
             if (player.hasPermission("zone.permissions")) commands.add("permissions");
             if (player.hasPermission("zone.create")) commands.add("cancel");
+            commands.add("show");
+            commands.add("hide");
 
             return commands.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
+
 
         if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
             if (!player.hasPermission("zone.reset.own") && !player.hasPermission("zone.reset.others")) {
@@ -59,6 +62,14 @@ public class ZoneTabCompleter implements TabCompleter {
                     .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
         }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("show")) {
+            return Arrays.asList("all", "my")
+                    .stream()
+                    .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
 
         if (args[0].equalsIgnoreCase("permissions")) {
             if (!player.hasPermission("zone.permissions")) {

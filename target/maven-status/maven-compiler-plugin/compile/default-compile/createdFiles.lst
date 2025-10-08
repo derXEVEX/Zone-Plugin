@@ -1,6 +1,7 @@
 ZoneSystem\SubZone.class
 ZoneSystem\ZonePermission.class
 ZoneSystem\SubZoneTabCompleter.class
+ZoneSystem\PlayerZoneVisualizer$1.class
 ZoneSystem\ZoneTabCompleter.class
 ZoneSystem\SubZoneListener.class
 ZoneSystem\ZoneCommand.class
@@ -17,6 +18,7 @@ ZoneSystem\ZoneListener.class
 ZoneSystem\SubZoneVisualizer$1.class
 ZoneSystem\ZonePermissionEntry.class
 ZoneSystem\ZoneSelection.class
+ZoneSystem\PlayerZoneVisualizer.class
 ZoneSystem\ZonePlugin.class
 ZoneSystem\ZoneCreateEvent.class
 ZoneSystem\Zone.class
