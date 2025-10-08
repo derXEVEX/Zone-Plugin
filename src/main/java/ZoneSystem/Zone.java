@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+
 
 public class Zone {
     private final UUID ownerUUID;
@@ -46,7 +48,7 @@ public class Zone {
 
 
     public String getOwnerName() {
-        return ownerName;
+        return Bukkit.getOfflinePlayer(ownerUUID).getName();
     }
 
     public UUID getOwnerUUID() {

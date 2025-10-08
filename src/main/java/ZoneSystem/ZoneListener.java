@@ -158,6 +158,7 @@ public class ZoneListener implements Listener {
 
         Zone playerZone = zoneManager.getZoneAt(player.getLocation());
 
+
         if (playerZone != null) {
             currentPlayerZones.put(playerId, playerZone);
             String zoneName = "Zone: " + playerZone.getOwnerName() + "#" + playerZone.getZoneNumber();
