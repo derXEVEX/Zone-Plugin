@@ -40,6 +40,7 @@ public class ZoneManager {
     private final HashMap<UUID, Zone> activeSubZoneCreations = new HashMap<>();
     private final HashMap<String, ZonePermissionEntry> zonePermissions = new HashMap<>();
 
+
     public ZoneManager() {
         this.zoneFile = new File(ZonePlugin.getInstance().getDataFolder(), "zones.json");
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -258,12 +259,6 @@ public class ZoneManager {
         }
     }
 
-    public int getTotalAreaForPlayer(UUID playerId) {
-        return zones.stream()
-                .filter(zone -> zone.getOwnerUUID().equals(playerId))
-                .mapToInt(Zone::getArea)
-                .sum();
-    }
 
     public boolean canPlayerCreateZone(UUID playerId, Zone newZone) {
         List<Zone> playerZones = getZonesForPlayer(playerId);
@@ -453,13 +448,33 @@ public class ZoneManager {
         }
     }
 
+
+    public void addAdminZone(Zone zone, boolean countTowardsLimit) {
+        zones.add(zone);
+        saveZones();
+
+        if (!countTowardsLimit) {
+            adminCreatedZones.put(zone.getOwnerUUID() + "#" + zone.getZoneNumber(), true);
+        }
+    }
+
+    private final HashMap<String, Boolean> adminCreatedZones = new HashMap<>();
+
+    public boolean countsTowardsLimit(UUID owner, int zoneNumber) {
+        return !adminCreatedZones.containsKey(owner + "#" + zoneNumber);
+    }
+
+    public int getTotalAreaForPlayer(UUID playerId) {
+        return zones.stream()
+                .filter(zone -> zone.getOwnerUUID().equals(playerId))
+                .filter(zone -> countsTowardsLimit(playerId, zone.getZoneNumber()))
+                .mapToInt(Zone::getArea)
+                .sum();
+    }
+
     public List<Zone> getAllZones() {
         return new ArrayList<>(zones);
     }
-
-
-
-
 
 
 

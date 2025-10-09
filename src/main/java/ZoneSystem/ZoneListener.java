@@ -107,7 +107,9 @@ public class ZoneListener implements Listener {
 
         if (oldSubZone != null && newZone != null) {
             currentPlayerZones.put(playerId, newZone);
-            String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
+            String zoneName = newZone.getCustomName() != null
+                    ? newZone.getCustomName()
+                    : "Zone: " + newZone.getDisplayName();
 
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
@@ -125,7 +127,9 @@ public class ZoneListener implements Listener {
 
             if (zoneChanged) {
                 currentPlayerZones.put(playerId, newZone);
-                String zoneName = "Zone: " + newZone.getOwnerName() + "#" + newZone.getZoneNumber();
+                String zoneName = newZone.getCustomName() != null
+                        ? newZone.getCustomName()
+                        : "Zone: " + newZone.getDisplayName();
 
                 if (bossBar == null) {
                     bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
@@ -158,16 +162,18 @@ public class ZoneListener implements Listener {
 
         Zone playerZone = zoneManager.getZoneAt(player.getLocation());
 
-
         if (playerZone != null) {
             currentPlayerZones.put(playerId, playerZone);
-            String zoneName = "Zone: " + playerZone.getOwnerName() + "#" + playerZone.getZoneNumber();
+            String zoneName = playerZone.getCustomName() != null
+                    ? playerZone.getCustomName()
+                    : "Zone: " + playerZone.getDisplayName();
 
             BossBar bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
             bossBar.addPlayer(player);
             activeBossBars.put(playerId, bossBar);
         }
     }
+
 
     @EventHandler
     public void onZoneCreate(ZoneCreateEvent event) {
@@ -183,8 +189,5 @@ public class ZoneListener implements Listener {
     public void clearSelection(UUID playerId) {
         selections.remove(playerId);
     }
-
-
-
 }
 

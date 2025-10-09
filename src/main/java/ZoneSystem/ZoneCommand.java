@@ -27,6 +27,14 @@ public class ZoneCommand implements CommandExecutor {
             return true;
         }
 
+        if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
+            return new AdminZoneCommand().onCommand(sender, command, label, args);
+        }
+
+
+
+
+
         switch (args[0].toLowerCase()) {
             case "create":
                 player.getInventory().addItem(plugin.getZoneTool());
@@ -237,6 +245,8 @@ public class ZoneCommand implements CommandExecutor {
                 plugin.getPlayerZoneVisualizer().stopVisualization(player);
                 player.sendMessage("§eZone borders hidden.");
                 return true;
+
+
 
 
 

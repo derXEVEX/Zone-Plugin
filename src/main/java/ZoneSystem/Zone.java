@@ -13,6 +13,7 @@ public class Zone {
     private final int x1, y1, z1;
     private final int x2, y2, z2;
     private final int zoneNumber;
+    private String customName;
 
     public Zone(UUID ownerUUID, String ownerName, int x1, int z1, int x2, int z2) {
         this.ownerUUID = ownerUUID;
@@ -48,8 +49,9 @@ public class Zone {
 
 
     public String getOwnerName() {
-        return Bukkit.getOfflinePlayer(ownerUUID).getName();
+        return ownerName;
     }
+
 
     public UUID getOwnerUUID() {
         return ownerUUID;
@@ -97,6 +99,18 @@ public class Zone {
         int length = x2 - x1 + 1;
         int width = z2 - z1 + 1;
         return length * width;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
+    }
+
+    public String getDisplayName() {
+        return customName != null ? customName : (ownerName + "#" + zoneNumber);
     }
 
 

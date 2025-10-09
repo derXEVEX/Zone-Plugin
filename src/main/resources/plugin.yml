@@ -17,6 +17,10 @@ commands:
     tab-completer: ZoneSystem.SubZoneTabCompleter
 
 permissions:
+  zone.admin:
+    description: Allows creating and managing zones as admin
+    default: op
+
   zone.use:
     description: Allows using the zone command
     default: true

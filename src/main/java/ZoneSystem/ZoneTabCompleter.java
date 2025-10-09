@@ -30,12 +30,53 @@ public class ZoneTabCompleter implements TabCompleter {
             if (player.hasPermission("zone.info")) commands.add("info");
             if (player.hasPermission("zone.permissions")) commands.add("permissions");
             if (player.hasPermission("zone.create")) commands.add("cancel");
+            if (player.hasPermission("zone.admin")) commands.add("admin");
             commands.add("show");
             commands.add("hide");
 
             return commands.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
+        }
+
+        // Admin Command Handling
+        if (args[0].equalsIgnoreCase("admin")) {
+            if (!player.hasPermission("zone.admin")) return suggestions;
+
+            if (args.length == 2) {
+                return Arrays.asList("create", "confirm", "cancel")
+                        .stream()
+                        .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
+            }
+
+            if (args[1].equalsIgnoreCase("confirm")) {
+                if (args.length == 3) {
+                    // Zielzone (PlayerName#Number)
+                    return Bukkit.getOnlinePlayers().stream()
+                            .map(p -> p.getName() + "#")
+                            .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
+                            .collect(Collectors.toList());
+                }
+
+                if (args.length == 4) {
+                    // Owner (Spielername)
+                    return Bukkit.getOnlinePlayers().stream()
+                            .map(Player::getName)
+                            .filter(s -> s.toLowerCase().startsWith(args[3].toLowerCase()))
+                            .collect(Collectors.toList());
+                }
+
+                if (args.length == 5) {
+                    // countTowardsLimit (true/false)
+                    return Arrays.asList("true", "false")
+                            .stream()
+                            .filter(s -> s.toLowerCase().startsWith(args[4].toLowerCase()))
+                            .collect(Collectors.toList());
+                }
+            }
+
+            return suggestions;
         }
 
 

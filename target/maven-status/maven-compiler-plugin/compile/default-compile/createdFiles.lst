@@ -1,3 +1,4 @@
+ZoneSystem\AdminZoneCommand.class
 ZoneSystem\SubZone.class
 ZoneSystem\ZonePermission.class
 ZoneSystem\SubZoneTabCompleter.class
@@ -15,6 +16,7 @@ ZoneSystem\ZoneManager.class
 ZoneSystem\ZoneManager$ZoneData.class
 ZoneSystem\SubZoneCommand.class
 ZoneSystem\ZoneListener.class
+ZoneSystem\AdminZoneCommand$AdminZoneCreation.class
 ZoneSystem\SubZoneVisualizer$1.class
 ZoneSystem\ZonePermissionEntry.class
 ZoneSystem\ZoneSelection.class
