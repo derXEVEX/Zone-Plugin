@@ -107,9 +107,7 @@ public class ZoneListener implements Listener {
 
         if (oldSubZone != null && newZone != null) {
             currentPlayerZones.put(playerId, newZone);
-            String zoneName = newZone.getCustomName() != null
-                    ? newZone.getCustomName()
-                    : "Zone: " + newZone.getDisplayName();
+            String zoneName = getZoneDisplayName(newZone);
 
             if (bossBar == null) {
                 bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
@@ -127,9 +125,7 @@ public class ZoneListener implements Listener {
 
             if (zoneChanged) {
                 currentPlayerZones.put(playerId, newZone);
-                String zoneName = newZone.getCustomName() != null
-                        ? newZone.getCustomName()
-                        : "Zone: " + newZone.getDisplayName();
+                String zoneName = getZoneDisplayName(newZone);
 
                 if (bossBar == null) {
                     bossBar = Bukkit.createBossBar(zoneName, BarColor.GREEN, BarStyle.SOLID);
@@ -152,6 +148,16 @@ public class ZoneListener implements Listener {
             }
         }
     }
+
+    private String getZoneDisplayName(Zone zone) {
+        if (zone.getCustomName() != null && zone.getCustomName().contains("#")) {
+            return "Zone: " + zone.getCustomName();
+        }
+        return zone.getCustomName() != null
+                ? zone.getCustomName()
+                : "Zone: " + zone.getDisplayName();
+    }
+
 
 
     @EventHandler

@@ -1,5 +1,6 @@
 package ZoneSystem;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,24 +32,17 @@ public class SubZoneCommand implements CommandExecutor {
                 return true;
             }
 
-            String[] parts = args[1].split("#");
-            if (parts.length != 2) {
-                player.sendMessage("§cInvalid format. Example: aip#1");
-                return true;
-            }
+            Zone mainZone = zoneManager.getZoneByIdentifier(args[1]);
 
-            String targetPlayer = parts[0];
-            int mainZoneNumber;
-            try {
-                mainZoneNumber = Integer.parseInt(parts[1]);
-            } catch (NumberFormatException e) {
-                player.sendMessage("§cInvalid zone number!");
-                return true;
-            }
-
-            Zone mainZone = zoneManager.getZoneByPlayerAndNumber(targetPlayer, mainZoneNumber);
             if (mainZone == null) {
-                player.sendMessage("§cMain zone " + targetPlayer + "#" + mainZoneNumber + " not found!");
+                player.sendMessage("§cZone not found! Use: /subzone create <CustomName|PlayerName#Number>");
+                return true;
+            }
+
+            int mainZoneNumber = mainZone.getZoneNumber();
+
+            if (mainZone == null) {
+                player.sendMessage("§cYou don't have permission to create subzones!");
                 return true;
             }
 
@@ -140,7 +134,25 @@ public class SubZoneCommand implements CommandExecutor {
                 return true;
             }
 
-            SubZone subZone = zoneManager.getSubZoneByNumbers(targetPlayer, mainZoneNumber, subZoneNumber);
+            String[] parts = args[1].split("#");
+            if (parts.length != 2) {
+                player.sendMessage("§cInvalid format! Use: PlayerName#ZoneNumber");
+                return true;
+            }
+
+            Zone mainZone = zoneManager.getZoneByIdentifier(parts[0] + "#" + parts[1]);
+
+            if (mainZone == null) {
+                player.sendMessage("§cMain zone not found!");
+                return true;
+            }
+
+            SubZone subZone = zoneManager.getSubZoneByNumbers(
+                    Bukkit.getOfflinePlayer(mainZone.getOwnerUUID()).getName(),
+                    mainZone.getZoneNumber(),
+                    subZoneNumber
+            );
+
             if (subZone == null) {
                 player.sendMessage("§cSubzone not found!");
                 return true;

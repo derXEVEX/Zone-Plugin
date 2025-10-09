@@ -259,6 +259,34 @@ public class ZoneManager {
         }
     }
 
+    public Zone getZoneByIdentifier(String identifier) {
+        // Format: "PlayerName#Number" ODER "CustomName"
+
+        // Zuerst: Suche nach Custom Name
+        Optional<Zone> byCustomName = zones.stream()
+                .filter(z -> z.getCustomName() != null && z.getCustomName().equalsIgnoreCase(identifier))
+                .findFirst();
+
+        if (byCustomName.isPresent()) {
+            return byCustomName.get();
+        }
+
+        // Fallback: PlayerName#Number Format
+        if (identifier.contains("#")) {
+            String[] parts = identifier.split("#");
+            if (parts.length != 2) return null;
+
+            try {
+                int zoneNumber = Integer.parseInt(parts[1]);
+                return getZoneByPlayerAndNumber(parts[0], zoneNumber);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
 
     public boolean canPlayerCreateZone(UUID playerId, Zone newZone) {
         List<Zone> playerZones = getZonesForPlayer(playerId);

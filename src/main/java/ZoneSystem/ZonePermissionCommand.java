@@ -18,35 +18,20 @@ public class ZonePermissionCommand implements CommandExecutor {
             return true;
         }
 
+        ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
+
         if (args.length < 2) {
             player.sendMessage("§cUsage: /zone permissions <PlayerName>#<Number> list | set <Player|*> <Permission|*> <true|false>");
             return true;
         }
 
-        String[] zoneParts = args[0].split("#");
-        if (zoneParts.length != 2) {
-            player.sendMessage("§cInvalid format. Example: PlayerName#1");
+        Zone targetZone = zoneManager.getZoneByIdentifier(args[0]);
+        if (targetZone == null) {
+            player.sendMessage("§cZone not found! Use: CustomName or PlayerName#Number");
             return true;
         }
 
-        String targetPlayer = zoneParts[0];
-        int zoneNumber;
-        try {
-            zoneNumber = Integer.parseInt(zoneParts[1]);
-        } catch (NumberFormatException e) {
-            player.sendMessage("§cInvalid zone number!");
-            return true;
-        }
-
-        ZoneManager zoneManager = ZonePlugin.getInstance().getZoneManager();
-        Zone zone = zoneManager.getZoneByPlayerAndNumber(targetPlayer, zoneNumber);
-
-        if (zone == null) {
-            player.sendMessage("§cZone not found!");
-            return true;
-        }
-
-        if (!zone.isOwner(player.getUniqueId())) {
+        if (!targetZone.isOwner(player.getUniqueId())) {
             player.sendMessage("§cYou can only manage your own zones!");
             return true;
         }
@@ -54,7 +39,7 @@ public class ZonePermissionCommand implements CommandExecutor {
         String subCommand = args[1].toLowerCase();
 
         if (subCommand.equals("list")) {
-            displayPermissions(player, zone, zoneManager);
+            displayPermissions(player, targetZone, zoneManager);
             return true;
         }
 
@@ -87,7 +72,7 @@ public class ZonePermissionCommand implements CommandExecutor {
 
             if (permissionKey.equals("*")) {
                 for (ZonePermission perm : ZonePermission.values()) {
-                    zoneManager.setZonePermission(zone.getOwnerUUID(), zone.getZoneNumber(), null, targetUser, perm, value);
+                    zoneManager.setZonePermission(targetZone.getOwnerUUID(), targetZone.getZoneNumber(), null, targetUser, perm, value);
                 }
                 String scope = targetUser == null ? "everyone" : targetUserName;
                 player.sendMessage("§aSet all permissions to " + value + " for " + scope + ".");
@@ -101,7 +86,7 @@ public class ZonePermissionCommand implements CommandExecutor {
                     return true;
                 }
 
-                zoneManager.setZonePermission(zone.getOwnerUUID(), zone.getZoneNumber(), null, targetUser, permission, value);
+                zoneManager.setZonePermission(targetZone.getOwnerUUID(), targetZone.getZoneNumber(), null, targetUser, permission, value);
                 String scope = targetUser == null ? "everyone" : targetUserName;
                 player.sendMessage("§aSet " + permission.getKey() + " to " + value + " for " + scope + ".");
             }

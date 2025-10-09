@@ -67,17 +67,14 @@ public class AdminZoneCommand implements CommandExecutor {
                     return true;
                 }
 
-                // Suche Online-Spieler
                 Player targetPlayer = Bukkit.getPlayer(ownerName);
                 UUID targetUUID;
                 String targetName;
 
                 if (targetPlayer != null) {
-                    // Spieler ist online
                     targetUUID = targetPlayer.getUniqueId();
                     targetName = targetPlayer.getName();
                 } else {
-                    // Suche Offline-Spieler
                     OfflinePlayer offlinePlayer = Arrays.stream(Bukkit.getOfflinePlayers())
                             .filter(p -> p.getName() != null && p.getName().equalsIgnoreCase(ownerName))
                             .findFirst()

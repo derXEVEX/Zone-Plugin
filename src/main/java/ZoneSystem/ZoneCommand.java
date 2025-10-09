@@ -91,22 +91,13 @@ public class ZoneCommand implements CommandExecutor {
                     return true;
                 }
 
-                String[] zoneParts = args[1].split("#");
-                if (zoneParts.length != 2) {
-                    player.sendMessage("§cInvalid format. Example: PlayerName#1");
+                if (args.length != 2) {
+                    player.sendMessage("§cUsage: /zone " + args[0] + " <CustomName|PlayerName#Number>");
                     return true;
                 }
 
-                String targetPlayer = zoneParts[0];
-                int zoneNumber;
-                try {
-                    zoneNumber = Integer.parseInt(zoneParts[1]);
-                } catch (NumberFormatException e) {
-                    player.sendMessage("§cInvalid zone number!");
-                    return true;
-                }
 
-                Zone targetZone = zoneManager.getZoneByPlayerAndNumber(targetPlayer, zoneNumber);
+                Zone targetZone = zoneManager.getZoneByIdentifier(args[1]);
                 if (targetZone == null) {
                     player.sendMessage("§cZone not found!");
                     return true;
